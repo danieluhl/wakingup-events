@@ -11,7 +11,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "format": "biome format",
-    "lint": "biome lint",
+    "lint": "biome check --write",
     "check": "biome check",
     "deploy": "pnpm run build && wrangler deploy",
     "db:generate": "drizzle-kit generate",
@@ -66,4 +66,3 @@
     "wrangler": "^4.70.0"
   }
 }
-
