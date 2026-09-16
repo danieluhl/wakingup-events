@@ -73,11 +73,12 @@ src/
 ## Coding Guidelines
 1. Use TypeScript strict mode
 2. Follow Biome formatting (tabs, double quotes)
-3. Use Shadcn components when available
-4. Keep components in `src/components/`
-5. Use file-based routing in `src/routes/`
-6. Database queries go in `src/db/`
-7. Auth configuration in `src/lib/auth.ts`
+3. Prefer Shadcn components over native HTML elements
+4. Minimize Tailwind classes in pages and components; keep utility styles inside Shadcn components
+5. Keep components in `src/components/`
+6. Use file-based routing in `src/routes/`
+7. Database queries go in `src/db/`
+8. Auth configuration in `src/lib/auth.ts`
 
 ## Cloudflare Specific
 - Uses `cloudflare:workers` for environment access

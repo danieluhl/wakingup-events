@@ -1,5 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Alert, AlertDescription } from "#/components/ui/alert";
+import { Badge } from "#/components/ui/badge";
+import { Button, buttonVariants } from "#/components/ui/button";
+import { Card } from "#/components/ui/card";
+import { Separator } from "#/components/ui/separator";
+import { Skeleton } from "#/components/ui/skeleton";
 import { authClient } from "#/lib/auth-client";
 
 export const Route = createFileRoute("/")({ component: Home });
@@ -34,27 +40,34 @@ function Home() {
 	}, [userId]);
 
 	if (isPending) {
-		return <main className="min-h-screen bg-stone-950" />;
+		return (
+			<main className="dark min-h-screen bg-background px-6 py-20">
+				<div className="mx-auto max-w-3xl space-y-6">
+					<Skeleton className="h-4 w-64" />
+					<Skeleton className="h-16 w-full" />
+				</div>
+			</main>
+		);
 	}
 
 	if (!session?.user) {
 		return (
-			<main className="min-h-screen bg-stone-950 px-6 py-20 text-stone-100">
-				<div className="mx-auto max-w-3xl border-l border-amber-400 pl-8 sm:pl-12">
-					<p className="text-sm uppercase tracking-[0.3em] text-amber-400">
+			<main className="dark min-h-screen bg-background px-6 py-20 text-foreground">
+				<div className="mx-auto max-w-3xl border-l border-[#a98d63] pl-8 sm:pl-12">
+					<Badge
+						variant="outline"
+						className="w-fit border-0 bg-transparent px-0 text-sm uppercase tracking-[0.3em] text-[#bba176]"
+					>
 						Waking Up Events
-					</p>
+					</Badge>
 					<h1 className="mt-6 max-w-2xl text-5xl font-semibold leading-tight sm:text-7xl">
 						Meet with attention.
 					</h1>
-					<p className="mt-6 max-w-xl text-lg leading-8 text-stone-400">
+					<p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
 						Sign in to explore your local account and verify the Better Auth
 						flow.
 					</p>
-					<Link
-						to="/login"
-						className="mt-10 inline-block bg-amber-400 px-6 py-3 font-semibold text-stone-950 transition hover:bg-amber-300"
-					>
+					<Link to="/login" className={buttonVariants({ className: "mt-10" })}>
 						Sign in
 					</Link>
 				</div>
@@ -63,51 +76,66 @@ function Home() {
 	}
 
 	return (
-		<main className="min-h-screen bg-stone-950 px-6 py-12 text-stone-100">
+		<main className="dark min-h-screen bg-background px-6 py-12 text-foreground">
 			<div className="mx-auto max-w-4xl">
-				<div className="flex flex-col gap-5 border-b border-stone-800 pb-8 sm:flex-row sm:items-end sm:justify-between">
+				<div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
 					<div>
-						<p className="text-sm uppercase tracking-[0.24em] text-amber-400">
+						<Badge
+							variant="outline"
+							className="w-fit border-0 bg-transparent px-0 text-sm uppercase tracking-[0.24em] text-[#bba176]"
+						>
 							Signed in locally
-						</p>
+						</Badge>
 						<h1 className="mt-3 text-4xl font-semibold">
 							Hello, {session.user.name}
 						</h1>
-						<p className="mt-2 text-stone-400">{session.user.email}</p>
+						<p className="mt-2 text-muted-foreground">{session.user.email}</p>
 					</div>
-					<button
+					<Button
 						type="button"
 						onClick={() => void authClient.signOut()}
-						className="border border-stone-700 px-5 py-2.5 text-sm hover:border-stone-500"
+						variant="outline"
 					>
 						Sign out
-					</button>
+					</Button>
 				</div>
+
+				<Separator className="my-8 bg-border" />
 
 				<section className="mt-10">
 					<div className="flex items-baseline justify-between gap-4">
 						<h2 className="text-xl font-medium">
 							Your Better Auth database records
 						</h2>
-						<span className="text-xs uppercase tracking-wider text-stone-500">
+						<Badge
+							variant="outline"
+							className="w-fit border-0 bg-transparent px-0 text-xs uppercase tracking-wider text-muted-foreground"
+						>
 							Credentials omitted
-						</span>
+						</Badge>
 					</div>
-					<p className="mt-2 text-sm text-stone-400">
+					<p className="mt-2 text-sm text-muted-foreground">
 						This is the user, account, and session metadata stored in local D1.
 						Password hashes and session tokens are never returned.
 					</p>
-					<div className="mt-6 overflow-x-auto border border-stone-800 bg-stone-900 p-5">
+					<Card className="mt-6 overflow-x-auto rounded-none border-border bg-card p-5 text-card-foreground shadow-none">
 						{dataError ? (
-							<p className="text-red-300">{dataError}</p>
+							<Alert
+								variant="destructive"
+								className="rounded-none border-0 bg-transparent p-0 text-red-300"
+							>
+								<AlertDescription className="text-red-300">
+									{dataError}
+								</AlertDescription>
+							</Alert>
 						) : (
-							<pre className="text-sm leading-7 text-stone-300">
+							<pre className="text-sm leading-7 text-card-foreground">
 								{databaseData
 									? JSON.stringify(databaseData, null, 2)
 									: "Loading database records..."}
 							</pre>
 						)}
-					</div>
+					</Card>
 				</section>
 			</div>
 		</main>

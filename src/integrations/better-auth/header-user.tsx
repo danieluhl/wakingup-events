@@ -1,35 +1,40 @@
+import { Avatar, AvatarFallback, AvatarImage } from "#/components/ui/avatar";
+import { Button } from "#/components/ui/button";
+import { Skeleton } from "#/components/ui/skeleton";
 import { authClient } from "#/lib/auth-client";
 
 export default function BetterAuthHeader() {
 	const { data: session, isPending } = authClient.useSession();
 
 	if (isPending) {
-		return (
-			<div className="h-8 w-8 bg-neutral-100 dark:bg-neutral-800 animate-pulse" />
-		);
+		return <Skeleton className="size-8 rounded-full" />;
 	}
 
 	if (session?.user) {
 		return (
 			<div className="flex items-center gap-2">
-				{session.user.image ? (
-					<img src={session.user.image} alt="" className="h-8 w-8" />
-				) : (
-					<div className="h-8 w-8 bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
-						<span className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
-							{session.user.name?.charAt(0).toUpperCase() || "U"}
-						</span>
-					</div>
-				)}
-				<button
+				<Avatar>
+					{session.user.image ? (
+						<AvatarImage
+							src={session.user.image}
+							alt={session.user.name ?? "User"}
+						/>
+					) : null}
+					<AvatarFallback className="text-xs font-medium">
+						{session.user.name?.charAt(0).toUpperCase() || "U"}
+					</AvatarFallback>
+				</Avatar>
+				<Button
 					type="button"
 					onClick={() => {
 						void authClient.signOut();
 					}}
-					className="flex-1 h-9 px-4 text-sm font-medium bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-50 border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+					className="flex-1"
+					size="sm"
+					variant="outline"
 				>
 					Sign out
-				</button>
+				</Button>
 			</div>
 		);
 	}
