@@ -4,4 +4,12 @@
   "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "wakingup-events",
+      "database_id": "85c92342-9daf-4375-b992-24e76a0e35d1",
+      "migrations_dir": "migrations",
+    },
+  ],
 }

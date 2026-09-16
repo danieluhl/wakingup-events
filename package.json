@@ -13,12 +13,19 @@
     "format": "biome format",
     "lint": "biome check --write",
     "check": "biome check",
+    "test:e2e": "pnpm run d1:migrate:local && playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "deploy": "pnpm run build && wrangler deploy",
+    "wrangler": "wrangler",
+    "cf-typegen": "wrangler types",
+    "d1:migrate:local": "wrangler d1 migrations apply DB --local",
+    "d1:migrate:remote": "wrangler d1 migrations apply DB --remote",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:pull": "drizzle-kit pull",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "validate": "pnpm run lint && pnpm run build"
   },
   "dependencies": {
     "@better-auth/infra": "^0.4.9",
@@ -50,6 +57,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.4.5",
     "@cloudflare/vite-plugin": "^1.26.0",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/typography": "^0.5.16",
     "@tanstack/devtools-event-client": "latest",
     "@tanstack/devtools-vite": "latest",
