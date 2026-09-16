@@ -13,6 +13,13 @@ interface MyRouterContext {
 	queryClient: QueryClient;
 }
 
+const themeScript = `(() => {
+	const preference = window.matchMedia("(prefers-color-scheme: dark)");
+	const applyTheme = ({ matches }) => document.documentElement.classList.toggle("dark", matches);
+	applyTheme(preference);
+	preference.addEventListener("change", applyTheme);
+})();`;
+
 export const Route = createRootRouteWithContext<MyRouterContext>()({
 	head: () => ({
 		meta: [
@@ -22,6 +29,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 			{
 				name: "viewport",
 				content: "width=device-width, initial-scale=1",
+			},
+			{
+				name: "color-scheme",
+				content: "light dark",
 			},
 			{
 				title: "Waking Up Events",
@@ -39,9 +50,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="en">
+		<html lang="en" suppressHydrationWarning>
 			<head>
 				<HeadContent />
+				{/* The static script must run before paint to prevent a theme flash. */}
+				<script>{themeScript}</script>
 			</head>
 			<body>
 				{children}

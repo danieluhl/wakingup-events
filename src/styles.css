@@ -7,6 +7,8 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  color-scheme: light;
+
   --sea-ink: #263d3a;
   --sea-ink-soft: #596b67;
   --lagoon: #718f89;
@@ -63,6 +65,8 @@
 }
 
 .dark {
+  color-scheme: dark;
+
   --sea-ink: #e5dccf;
   --sea-ink-soft: #b8aa98;
   --lagoon: #78928c;
@@ -280,7 +284,7 @@ button {
 }
 
 .dark .button-block {
-  --button-depth: #c8b99f;
+  --button-depth: #a99b84;
 }
 
 .button-block:not(:disabled):hover {
