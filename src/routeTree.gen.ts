@@ -12,8 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DesignRouteImport } from './routes/design'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ApiAuthRouteImport } from './routes/api/auth'
 import { Route as ApiMeRouteImport } from './routes/api/me'
+import { Route as ApiWorkspacesRouteImport } from './routes/api/workspaces'
+import { Route as GroupsSlugRouteImport } from './routes/groups/$slug'
+import { Route as GroupsNewRouteImport } from './routes/groups/new'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiWorkspacesMembersRouteImport } from './routes/api/workspaces/members'
+import { Route as GroupsSlugRolesRouteImport } from './routes/groups/$slug_.roles'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -30,14 +36,44 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthRoute = ApiAuthRouteImport.update({
+  id: '/api/auth',
+  path: '/api/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiMeRoute = ApiMeRouteImport.update({
   id: '/api/me',
   path: '/api/me',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWorkspacesRoute = ApiWorkspacesRouteImport.update({
+  id: '/api/workspaces',
+  path: '/api/workspaces',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GroupsSlugRoute = GroupsSlugRouteImport.update({
+  id: '/groups/$slug',
+  path: '/groups/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GroupsNewRoute = GroupsNewRouteImport.update({
+  id: '/groups/new',
+  path: '/groups/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => ApiAuthRoute,
+} as any)
+const ApiWorkspacesMembersRoute = ApiWorkspacesMembersRouteImport.update({
+  id: '/members',
+  path: '/members',
+  getParentRoute: () => ApiWorkspacesRoute,
+} as any)
+const GroupsSlugRolesRoute = GroupsSlugRolesRouteImport.update({
+  id: '/groups/$slug_/roles',
+  path: '/groups/$slug/roles',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -45,38 +81,94 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
+  '/api/auth': typeof ApiAuthRouteWithChildren
   '/api/me': typeof ApiMeRoute
+  '/api/workspaces': typeof ApiWorkspacesRouteWithChildren
+  '/groups/$slug': typeof GroupsSlugRoute
+  '/groups/new': typeof GroupsNewRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/workspaces/members': typeof ApiWorkspacesMembersRoute
+  '/groups/$slug/roles': typeof GroupsSlugRolesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
+  '/api/auth': typeof ApiAuthRouteWithChildren
   '/api/me': typeof ApiMeRoute
+  '/api/workspaces': typeof ApiWorkspacesRouteWithChildren
+  '/groups/$slug': typeof GroupsSlugRoute
+  '/groups/new': typeof GroupsNewRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/workspaces/members': typeof ApiWorkspacesMembersRoute
+  '/groups/$slug/roles': typeof GroupsSlugRolesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
+  '/api/auth': typeof ApiAuthRouteWithChildren
   '/api/me': typeof ApiMeRoute
+  '/api/workspaces': typeof ApiWorkspacesRouteWithChildren
+  '/groups/$slug': typeof GroupsSlugRoute
+  '/groups/new': typeof GroupsNewRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/workspaces/members': typeof ApiWorkspacesMembersRoute
+  '/groups/$slug_/roles': typeof GroupsSlugRolesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/design' | '/login' | '/api/me' | '/api/auth/$'
+  fullPaths:
+    | '/'
+    | '/design'
+    | '/login'
+    | '/api/auth'
+    | '/api/me'
+    | '/api/workspaces'
+    | '/groups/$slug'
+    | '/groups/new'
+    | '/api/auth/$'
+    | '/api/workspaces/members'
+    | '/groups/$slug/roles'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/design' | '/login' | '/api/me' | '/api/auth/$'
-  id: '__root__' | '/' | '/design' | '/login' | '/api/me' | '/api/auth/$'
+  to:
+    | '/'
+    | '/design'
+    | '/login'
+    | '/api/auth'
+    | '/api/me'
+    | '/api/workspaces'
+    | '/groups/$slug'
+    | '/groups/new'
+    | '/api/auth/$'
+    | '/api/workspaces/members'
+    | '/groups/$slug/roles'
+  id:
+    | '__root__'
+    | '/'
+    | '/design'
+    | '/login'
+    | '/api/auth'
+    | '/api/me'
+    | '/api/workspaces'
+    | '/groups/$slug'
+    | '/groups/new'
+    | '/api/auth/$'
+    | '/api/workspaces/members'
+    | '/groups/$slug_/roles'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DesignRoute: typeof DesignRoute
   LoginRoute: typeof LoginRoute
+  ApiAuthRoute: typeof ApiAuthRouteWithChildren
   ApiMeRoute: typeof ApiMeRoute
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiWorkspacesRoute: typeof ApiWorkspacesRouteWithChildren
+  GroupsSlugRoute: typeof GroupsSlugRoute
+  GroupsNewRoute: typeof GroupsNewRoute
+  GroupsSlugRolesRoute: typeof GroupsSlugRolesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -102,6 +194,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth': {
+      id: '/api/auth'
+      path: '/api/auth'
+      fullPath: '/api/auth'
+      preLoaderRoute: typeof ApiAuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/me': {
       id: '/api/me'
       path: '/api/me'
@@ -109,22 +208,84 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiMeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/workspaces': {
+      id: '/api/workspaces'
+      path: '/api/workspaces'
+      fullPath: '/api/workspaces'
+      preLoaderRoute: typeof ApiWorkspacesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/groups/$slug': {
+      id: '/groups/$slug'
+      path: '/groups/$slug'
+      fullPath: '/groups/$slug'
+      preLoaderRoute: typeof GroupsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/groups/new': {
+      id: '/groups/new'
+      path: '/groups/new'
+      fullPath: '/groups/new'
+      preLoaderRoute: typeof GroupsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
-      path: '/api/auth/$'
+      path: '/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof ApiAuthRoute
+    }
+    '/api/workspaces/members': {
+      id: '/api/workspaces/members'
+      path: '/members'
+      fullPath: '/api/workspaces/members'
+      preLoaderRoute: typeof ApiWorkspacesMembersRouteImport
+      parentRoute: typeof ApiWorkspacesRoute
+    }
+    '/groups/$slug_/roles': {
+      id: '/groups/$slug_/roles'
+      path: '/groups/$slug/roles'
+      fullPath: '/groups/$slug/roles'
+      preLoaderRoute: typeof GroupsSlugRolesRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
+interface ApiAuthRouteChildren {
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+}
+
+const ApiAuthRouteChildren: ApiAuthRouteChildren = {
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
+}
+
+const ApiAuthRouteWithChildren =
+  ApiAuthRoute._addFileChildren(ApiAuthRouteChildren)
+
+interface ApiWorkspacesRouteChildren {
+  ApiWorkspacesMembersRoute: typeof ApiWorkspacesMembersRoute
+}
+
+const ApiWorkspacesRouteChildren: ApiWorkspacesRouteChildren = {
+  ApiWorkspacesMembersRoute: ApiWorkspacesMembersRoute,
+}
+
+const ApiWorkspacesRouteWithChildren = ApiWorkspacesRoute._addFileChildren(
+  ApiWorkspacesRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DesignRoute: DesignRoute,
   LoginRoute: LoginRoute,
+  ApiAuthRoute: ApiAuthRouteWithChildren,
   ApiMeRoute: ApiMeRoute,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiWorkspacesRoute: ApiWorkspacesRouteWithChildren,
+  GroupsSlugRoute: GroupsSlugRoute,
+  GroupsNewRoute: GroupsNewRoute,
+  GroupsSlugRolesRoute: GroupsSlugRolesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

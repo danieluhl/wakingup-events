@@ -53,7 +53,7 @@ function Login() {
 
 	if (isSessionPending) {
 		return (
-			<main className="min-h-screen bg-background px-6 py-16">
+			<main className="min-h-[calc(100dvh-4rem)] bg-background px-6 py-16">
 				<div className="mx-auto max-w-md space-y-4">
 					<Skeleton className="h-5 w-40" />
 					<Skeleton className="h-72 w-full rounded-none" />
@@ -64,7 +64,7 @@ function Login() {
 
 	if (session?.user) {
 		return (
-			<main className="min-h-screen bg-background px-6 py-20 text-foreground">
+			<main className="min-h-[calc(100dvh-4rem)] bg-background px-6 py-20 text-foreground">
 				<Card className="mx-auto max-w-md gap-8 rounded-none border-border bg-card shadow-none">
 					<CardHeader>
 						<Badge
@@ -86,7 +86,7 @@ function Login() {
 	}
 
 	return (
-		<main className="min-h-screen bg-background px-6 py-16 text-foreground">
+		<main className="min-h-[calc(100dvh-4rem)] bg-background px-6 py-16 text-foreground">
 			<div className="mx-auto max-w-md">
 				<Link
 					to="/"
@@ -107,8 +107,8 @@ function Login() {
 						</CardTitle>
 						<CardDescription className="leading-6 text-muted-foreground">
 							{isCreatingAccount
-								? "Your account will be stored in the local D1 database."
-								: "Sign in with an account in the local D1 database."}
+								? ""
+								: "Sign in with your account credentials."}
 						</CardDescription>
 					</CardHeader>
 					<CardContent>

@@ -48,7 +48,7 @@ function ComponentsGallery() {
 	}, [isDark]);
 
 	return (
-		<main className="page-wrap flex min-h-screen flex-col gap-12 py-16">
+		<main className="page-wrap flex min-h-[calc(100dvh-4rem)] flex-col gap-12 py-16">
 			<div className="flex flex-col gap-6">
 				<Link
 					to="/"

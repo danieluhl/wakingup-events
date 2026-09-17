@@ -140,6 +140,7 @@ src/
 6. Use file-based routing in `src/routes/`
 7. Database queries go in `src/db/`
 8. Auth configuration in `src/lib/auth.ts`
+9. Avoid abstraction where it's not completely necessary; prefer duplicating code over early abstraction
 
 ## Cloudflare Specific
 - Uses `cloudflare:workers` for environment access

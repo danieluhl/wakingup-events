@@ -11,7 +11,7 @@ export default function cleanupPlaywrightUsers() {
 			"DB",
 			"--local",
 			"--command",
-			"DELETE FROM user WHERE email LIKE 'playwright-%@example.com'",
+			"DELETE FROM workspace WHERE created_by_user_id IN (SELECT id FROM user WHERE email LIKE 'playwright-%@example.com'); DELETE FROM user WHERE email LIKE 'playwright-%@example.com'",
 		],
 		{ stdio: "ignore" },
 	);

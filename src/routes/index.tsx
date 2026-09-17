@@ -41,7 +41,7 @@ function Home() {
 
 	if (isPending) {
 		return (
-			<main className="min-h-screen bg-background px-6 py-20">
+			<main className="min-h-[calc(100dvh-4rem)] bg-background px-6 py-20">
 				<div className="mx-auto max-w-3xl space-y-6">
 					<Skeleton className="h-4 w-64" />
 					<Skeleton className="h-16 w-full" />
@@ -52,7 +52,7 @@ function Home() {
 
 	if (!session?.user) {
 		return (
-			<main className="min-h-screen bg-background px-6 py-20 text-foreground">
+			<main className="min-h-[calc(100dvh-4rem)] bg-background px-6 py-20 text-foreground">
 				<div className="mx-auto max-w-3xl border-l border-[#a98d63] pl-8 sm:pl-12">
 					<Badge
 						variant="outline"
@@ -76,7 +76,7 @@ function Home() {
 	}
 
 	return (
-		<main className="min-h-screen bg-background px-6 py-12 text-foreground">
+		<main className="min-h-[calc(100dvh-4rem)] bg-background px-6 py-12 text-foreground">
 			<div className="mx-auto max-w-4xl">
 				<div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
 					<div>
@@ -91,13 +91,18 @@ function Home() {
 						</h1>
 						<p className="mt-2 text-muted-foreground">{session.user.email}</p>
 					</div>
-					<Button
-						type="button"
-						onClick={() => void authClient.signOut()}
-						variant="outline"
-					>
-						Sign out
-					</Button>
+					<div className="flex flex-wrap gap-4">
+						<Link to="/groups/new" className={buttonVariants()}>
+							Create group
+						</Link>
+						<Button
+							type="button"
+							onClick={() => void authClient.signOut()}
+							variant="outline"
+						>
+							Sign out
+						</Button>
+					</div>
 				</div>
 
 				<Separator className="my-8 bg-border" />

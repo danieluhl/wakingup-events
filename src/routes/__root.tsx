@@ -6,6 +6,8 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { AppShell } from "#/components/app-shell";
+import { TooltipProvider } from "#/components/ui/tooltip";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
 
@@ -57,7 +59,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<script>{themeScript}</script>
 			</head>
 			<body>
-				{children}
+				<TooltipProvider>
+					<AppShell>{children}</AppShell>
+				</TooltipProvider>
 				<TanStackDevtools
 					config={{
 						position: "bottom-right",
