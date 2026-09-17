@@ -1,8 +1,31 @@
+import { env as workerEnv } from "cloudflare:workers";
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
+/**
+ * The Cloudflare Worker bindings (`env`) are only available server-side, so
+ * the runtime env object is assembled explicitly here. The D1 `DB` binding is
+ * a runtime object handled separately (see `src/lib/auth.ts`), not an env var.
+ */
+const runtimeEnv: Record<string, string | boolean | number | undefined> = {
+	BETTER_AUTH_URL: workerEnv.BETTER_AUTH_URL,
+	BETTER_AUTH_SECRET: workerEnv.BETTER_AUTH_SECRET,
+	BETTER_AUTH_API_KEY: workerEnv.BETTER_AUTH_API_KEY,
+	DATABASE_URL: workerEnv.DATABASE_URL,
+	GOOGLE_CLIENT_ID: workerEnv.GOOGLE_CLIENT_ID,
+	GOOGLE_CLIENT_SECRET: workerEnv.GOOGLE_CLIENT_SECRET,
+	SERVER_URL: workerEnv.SERVER_URL,
+	VITE_APP_TITLE: import.meta.env.VITE_APP_TITLE,
+};
+
 export const env = createEnv({
 	server: {
+		BETTER_AUTH_URL: z.string().url(),
+		BETTER_AUTH_SECRET: z.string().min(32),
+		BETTER_AUTH_API_KEY: z.string().min(1).optional(),
+		DATABASE_URL: z.string().min(1).optional(),
+		GOOGLE_CLIENT_ID: z.string().min(1),
+		GOOGLE_CLIENT_SECRET: z.string().min(1),
 		SERVER_URL: z.string().url().optional(),
 	},
 
@@ -16,11 +39,7 @@ export const env = createEnv({
 		VITE_APP_TITLE: z.string().min(1).optional(),
 	},
 
-	/**
-	 * What object holds the environment variables at runtime. This is usually
-	 * `process.env` or `import.meta.env`.
-	 */
-	runtimeEnv: import.meta.env,
+	runtimeEnv,
 
 	/**
 	 * By default, this library will feed the environment variables directly to

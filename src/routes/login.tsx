@@ -48,7 +48,22 @@ function Login() {
 			return;
 		}
 
-		await navigate({ to: "/" });
+		await navigate({ to: "/dashboard" });
+	};
+
+	const handleGoogleSignIn = async () => {
+		setError(null);
+		setIsSubmitting(true);
+
+		const result = await authClient.signIn.social({
+			provider: "google",
+			callbackURL: "/dashboard",
+		});
+
+		if (result.error) {
+			setError(result.error.message ?? "Google sign-in failed");
+			setIsSubmitting(false);
+		}
 	};
 
 	if (isSessionPending) {
@@ -76,8 +91,8 @@ function Login() {
 						<CardTitle className="text-3xl">{session.user.email}</CardTitle>
 					</CardHeader>
 					<CardContent>
-						<Link to="/" className={buttonVariants()}>
-							View your account
+						<Link to="/dashboard" className={buttonVariants()}>
+							Go to dashboard
 						</Link>
 					</CardContent>
 				</Card>
@@ -112,6 +127,20 @@ function Login() {
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
+						<Button
+							type="button"
+							variant="outline"
+							disabled={isSubmitting}
+							onClick={() => void handleGoogleSignIn()}
+							className="w-full disabled:cursor-wait"
+						>
+							Continue with Google
+						</Button>
+						<div className="my-6 flex items-center gap-3 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+							<div className="h-px flex-1 bg-border" />
+							<span>or continue with email</span>
+							<div className="h-px flex-1 bg-border" />
+						</div>
 						<form className="space-y-5" onSubmit={handleSubmit}>
 							{isCreatingAccount && (
 								<div className="grid gap-2">

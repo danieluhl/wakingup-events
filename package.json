@@ -14,7 +14,7 @@
     "lint": "biome check --write",
     "check": "biome check",
     "test:e2e": "pnpm run d1:migrate:local && playwright test",
-    "test:e2e:ui": "playwright test --ui",
+    "test:ui": "playwright test --ui",
     "deploy": "pnpm run build && wrangler deploy",
     "wrangler": "wrangler",
     "cf-typegen": "wrangler types",

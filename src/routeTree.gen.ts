@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DesignRouteImport } from './routes/design'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ApiMeRouteImport } from './routes/api/me'
@@ -23,6 +24,11 @@ import { Route as GroupsSlugRolesRouteImport } from './routes/groups/$slug_.role
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DesignRoute = DesignRouteImport.update({
@@ -56,9 +62,9 @@ const GroupsNewRoute = GroupsNewRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/$',
-  path: '/$',
-  getParentRoute: () => ApiAuthRoute,
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiWorkspacesMembersRoute = ApiWorkspacesMembersRouteImport.update({
   id: '/members',
@@ -73,6 +79,7 @@ const GroupsSlugRolesRoute = GroupsSlugRolesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/api/me': typeof ApiMeRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/api/me': typeof ApiMeRoute
@@ -98,6 +106,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/api/me': typeof ApiMeRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dashboard'
     | '/design'
     | '/login'
     | '/api/me'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/dashboard'
     | '/design'
     | '/login'
     | '/api/me'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/dashboard'
     | '/design'
     | '/login'
     | '/api/me'
@@ -149,12 +161,14 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRoute
   DesignRoute: typeof DesignRoute
   LoginRoute: typeof LoginRoute
   ApiMeRoute: typeof ApiMeRoute
   ApiWorkspacesRoute: typeof ApiWorkspacesRouteWithChildren
   GroupsSlugRoute: typeof GroupsSlugRoute
   GroupsNewRoute: typeof GroupsNewRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   GroupsSlugRolesRoute: typeof GroupsSlugRolesRoute
 }
 
@@ -165,6 +179,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/design': {
@@ -211,10 +232,10 @@ declare module '@tanstack/react-router' {
     }
     '/api/auth/$': {
       id: '/api/auth/$'
-      path: '/$'
+      path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof ApiAuthRoute
+      parentRoute: typeof rootRouteImport
     }
     '/api/workspaces/members': {
       id: '/api/workspaces/members'
@@ -247,12 +268,14 @@ const ApiWorkspacesRouteWithChildren = ApiWorkspacesRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRoute,
   DesignRoute: DesignRoute,
   LoginRoute: LoginRoute,
   ApiMeRoute: ApiMeRoute,
   ApiWorkspacesRoute: ApiWorkspacesRouteWithChildren,
   GroupsSlugRoute: GroupsSlugRoute,
   GroupsNewRoute: GroupsNewRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
   GroupsSlugRolesRoute: GroupsSlugRolesRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,10 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Alert, AlertDescription } from "#/components/ui/alert";
-import { Badge } from "#/components/ui/badge";
-import { Button, buttonVariants } from "#/components/ui/button";
-import { Card } from "#/components/ui/card";
-import { Separator } from "#/components/ui/separator";
+import { ArrowRight, CalendarDays, MapPin, Users } from "lucide-react";
+import { buttonVariants } from "#/components/ui/button";
 import { Skeleton } from "#/components/ui/skeleton";
 import { authClient } from "#/lib/auth-client";
 
@@ -12,137 +8,118 @@ export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
 	const { data: session, isPending } = authClient.useSession();
-	const userId = session?.user.id;
-	const [databaseData, setDatabaseData] = useState<unknown>(null);
-	const [dataError, setDataError] = useState<string | null>(null);
-
-	useEffect(() => {
-		if (!userId) {
-			setDatabaseData(null);
-			return;
-		}
-
-		const controller = new AbortController();
-		setDataError(null);
-		void fetch("/api/me", { signal: controller.signal })
-			.then(async (response) => {
-				if (!response.ok) throw new Error("Could not load account data");
-				return response.json();
-			})
-			.then(setDatabaseData)
-			.catch((error: unknown) => {
-				if (error instanceof Error && error.name !== "AbortError") {
-					setDataError(error.message);
-				}
-			});
-
-		return () => controller.abort();
-	}, [userId]);
-
-	if (isPending) {
-		return (
-			<main className="min-h-[calc(100dvh-4rem)] bg-background px-6 py-20">
-				<div className="mx-auto max-w-3xl space-y-6">
-					<Skeleton className="h-4 w-64" />
-					<Skeleton className="h-16 w-full" />
-				</div>
-			</main>
-		);
-	}
-
-	if (!session?.user) {
-		return (
-			<main className="min-h-[calc(100dvh-4rem)] bg-background px-6 py-20 text-foreground">
-				<div className="mx-auto max-w-3xl border-l border-[#a98d63] pl-8 sm:pl-12">
-					<Badge
-						variant="outline"
-						className="w-fit border-0 bg-transparent px-0 text-sm uppercase tracking-[0.3em] text-[#bba176]"
-					>
-						Waking Up Events
-					</Badge>
-					<h1 className="mt-6 max-w-2xl text-5xl font-semibold leading-tight sm:text-7xl">
-						Meet with attention.
-					</h1>
-					<p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
-						Sign in to explore your local account and verify the Better Auth
-						flow.
-					</p>
-					<Link to="/login" className={buttonVariants({ className: "mt-10" })}>
-						Sign in
-					</Link>
-				</div>
-			</main>
-		);
-	}
+	const destination = session?.user ? "/dashboard" : "/login";
 
 	return (
-		<main className="min-h-[calc(100dvh-4rem)] bg-background px-6 py-12 text-foreground">
-			<div className="mx-auto max-w-4xl">
-				<div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-					<div>
-						<Badge
-							variant="outline"
-							className="w-fit border-0 bg-transparent px-0 text-sm uppercase tracking-[0.24em] text-[#bba176]"
-						>
-							Signed in locally
-						</Badge>
-						<h1 className="mt-3 text-4xl font-semibold">
-							Hello, {session.user.name}
-						</h1>
-						<p className="mt-2 text-muted-foreground">{session.user.email}</p>
-					</div>
-					<div className="flex flex-wrap gap-4">
-						<Link to="/groups/new" className={buttonVariants()}>
-							Create group
-						</Link>
-						<Button
-							type="button"
-							onClick={() => void authClient.signOut()}
-							variant="outline"
-						>
-							Sign out
-						</Button>
-					</div>
-				</div>
+		<main className="relative isolate min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground">
+			<div
+				className="pointer-events-none absolute inset-0 opacity-45 dark:opacity-20"
+				style={{
+					backgroundImage:
+						"linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px)",
+					backgroundSize: "72px 72px",
+					maskImage:
+						"linear-gradient(to right, transparent, black 45%, black 100%)",
+				}}
+			/>
+			<div className="pointer-events-none absolute -right-32 top-14 size-136 rounded-full border border-(--line) bg-[color-mix(in_oklab,var(--lagoon)_13%,transparent)] sm:-right-16 lg:right-[5%] lg:size-168" />
+			<div className="pointer-events-none absolute right-[18%] top-44 hidden size-72 rounded-full border border-(--line) lg:block" />
 
-				<Separator className="my-8 bg-border" />
-
-				<section className="mt-10">
-					<div className="flex items-baseline justify-between gap-4">
-						<h2 className="text-xl font-medium">
-							Your Better Auth database records
-						</h2>
-						<Badge
-							variant="outline"
-							className="w-fit border-0 bg-transparent px-0 text-xs uppercase tracking-wider text-muted-foreground"
-						>
-							Credentials omitted
-						</Badge>
-					</div>
-					<p className="mt-2 text-sm text-muted-foreground">
-						This is the user, account, and session metadata stored in local D1.
-						Password hashes and session tokens are never returned.
+			<div className="relative mx-auto grid min-h-[calc(100dvh-4rem)] max-w-360 items-center gap-14 px-6 py-16 sm:px-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(25rem,0.9fr)] lg:px-16 lg:py-20">
+				<section className="rise-in max-w-4xl">
+					<p className="island-kicker flex items-center gap-3">
+						<span className="h-px w-10 bg-(--kicker)" />A place for shared
+						practice
 					</p>
-					<Card className="mt-6 overflow-x-auto rounded-none border-border bg-card p-5 text-card-foreground shadow-none">
-						{dataError ? (
-							<Alert
-								variant="destructive"
-								className="rounded-none border-0 bg-transparent p-0 text-red-300"
-							>
-								<AlertDescription className="text-red-300">
-									{dataError}
-								</AlertDescription>
-							</Alert>
+					<h1 className="display-title mt-7 text-[clamp(3.5rem,8.5vw,8rem)] font-bold leading-[0.88] tracking-[-0.045em] text-(--sea-ink)">
+						Meet in
+						<br />
+						<span className="text-(--lagoon-deep)">presence.</span>
+					</h1>
+					<p className="mt-8 max-w-2xl text-lg leading-8 text-(--sea-ink-soft) sm:text-xl sm:leading-9">
+						Discover meditation events and local gatherings made for quiet
+						attention, open inquiry, and meaningful connection.
+					</p>
+
+					<div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-5">
+						{isPending ? (
+							<Skeleton className="h-13 w-44 rounded-none" />
 						) : (
-							<pre className="text-sm leading-7 text-card-foreground">
-								{databaseData
-									? JSON.stringify(databaseData, null, 2)
-									: "Loading database records..."}
-							</pre>
+							<Link to={destination} className={buttonVariants({ size: "lg" })}>
+								{session?.user ? "Go to dashboard" : "Sign in to begin"}
+								<ArrowRight className="ml-2 size-4" aria-hidden="true" />
+							</Link>
 						)}
-					</Card>
+						<p className="max-w-52 text-sm leading-6 text-(--sea-ink-soft)">
+							{session?.user
+								? `Welcome back, ${session.user.name}.`
+								: "Your next gathering may be closer than you think."}
+						</p>
+					</div>
+				</section>
+
+				<section
+					aria-label="What you can do"
+					className="relative mx-auto w-full max-w-xl lg:justify-self-end"
+				>
+					<div className="island-shell relative rounded-2xl p-7 sm:p-10">
+						<div className="mb-10 flex items-start justify-between gap-6">
+							<div>
+								<p className="island-kicker">Gather nearby</p>
+								<h2 className="display-title mt-2 text-3xl font-bold">
+									Find your community
+								</h2>
+							</div>
+							<div className="flex size-12 shrink-0 items-center justify-center rounded-full border border-(--line) bg-(--chip-bg)">
+								<MapPin className="size-5" aria-hidden="true" />
+							</div>
+						</div>
+
+						<div className="grid gap-3">
+							<Feature
+								icon={CalendarDays}
+								title="Discover gatherings"
+								description="Explore sittings, workshops, and retreats around you."
+							/>
+							<Feature
+								icon={Users}
+								title="Share your story"
+								description="Meet people who value attention, reflection, and care."
+							/>
+							<Feature
+								icon={MapPin}
+								title="Create a local group"
+								description="Offer your community a steady place to connect."
+							/>
+						</div>
+					</div>
 				</section>
 			</div>
 		</main>
+	);
+}
+
+function Feature({
+	icon: Icon,
+	title,
+	description,
+}: {
+	icon: typeof CalendarDays;
+	title: string;
+	description: string;
+}) {
+	return (
+		<div className="flex gap-4 border-t border-(--line) py-5 first:border-t-0 first:pt-0 last:pb-0">
+			<Icon
+				className="mt-1 size-5 shrink-0 text-(--lagoon-deep)"
+				aria-hidden="true"
+			/>
+			<div>
+				<h3 className="font-bold text-(--sea-ink)">{title}</h3>
+				<p className="mt-1 text-sm leading-6 text-(--sea-ink-soft)">
+					{description}
+				</p>
+			</div>
+		</div>
 	);
 }

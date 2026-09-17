@@ -9,13 +9,13 @@ import {
 	X,
 } from "lucide-react";
 import { useState } from "react";
-import { Avatar, AvatarFallback } from "#/components/ui/avatar";
-import { Button } from "#/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "#/components/ui/avatar";
+import { Button, buttonVariants } from "#/components/ui/button";
 import { authClient } from "#/lib/auth-client";
 import { cn } from "#/lib/utils";
 
 const navigation = [
-	{ label: "Home", to: "/", icon: House },
+	{ label: "Dashboard", to: "/dashboard", icon: House },
 	{ label: "Create group", to: "/groups/new", icon: Plus },
 ] as const;
 
@@ -35,26 +35,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 	const { data: session } = authClient.useSession();
 	const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+	const isPublicPage = pathname === "/" || pathname === "/login";
 
 	return (
 		<div className="min-h-dvh bg-background text-foreground">
 			<header className="sticky top-0 z-40 h-16 border-b border-border bg-background">
 				<div className="flex h-full items-center justify-between gap-4 px-4 sm:px-6">
 					<div className="flex min-w-0 items-center gap-3">
-						<Button
-							type="button"
-							variant="ghost"
-							size="icon"
-							className="button-flat border-transparent dark:border-transparent lg:hidden"
-							aria-label={
-								isMobileMenuOpen ? "Close navigation" : "Open navigation"
-							}
-							aria-expanded={isMobileMenuOpen}
-							aria-controls="mobile-navigation"
-							onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
-						>
-							{isMobileMenuOpen ? <X /> : <Menu />}
-						</Button>
+						{!isPublicPage && (
+							<Button
+								type="button"
+								variant="ghost"
+								size="icon"
+								className="button-flat border-transparent dark:border-transparent lg:hidden"
+								aria-label={
+									isMobileMenuOpen ? "Close navigation" : "Open navigation"
+								}
+								aria-expanded={isMobileMenuOpen}
+								aria-controls="mobile-navigation"
+								onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
+							>
+								{isMobileMenuOpen ? <X /> : <Menu />}
+							</Button>
+						)}
 						<Link
 							to="/"
 							className="flex min-w-0 items-center gap-3 text-foreground no-underline hover:text-foreground"
@@ -75,6 +78,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
 					{session?.user ? (
 						<div className="flex min-w-0 items-center gap-3">
+							<Link to="/dashboard" className={buttonVariants({ size: "sm" })}>
+								Dashboard
+							</Link>
 							<div className="hidden min-w-0 text-right sm:block">
 								<p className="truncate text-sm font-semibold">
 									{session.user.name}
@@ -84,6 +90,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 								</p>
 							</div>
 							<Avatar>
+								{session.user.image && (
+									<AvatarImage
+										src={session.user.image}
+										alt={session.user.name}
+									/>
+								)}
 								<AvatarFallback>
 									{getInitials(session.user.name) || "WU"}
 								</AvatarFallback>
@@ -97,7 +109,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 				</div>
 			</header>
 
-			{isMobileMenuOpen && (
+			{!isPublicPage && isMobileMenuOpen && (
 				<>
 					<button
 						type="button"
@@ -119,39 +131,41 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 			)}
 
 			<div className="flex min-h-[calc(100dvh-4rem)]">
-				<aside
-					className={cn(
-						"sticky top-16 hidden h-[calc(100dvh-4rem)] shrink-0 border-r border-border bg-card transition-[width] duration-200 lg:flex lg:flex-col",
-						isSidebarCollapsed ? "w-20" : "w-64",
-					)}
-				>
-					<nav aria-label="Main navigation" className="flex-1 p-3">
-						<NavigationLinks
-							pathname={pathname}
-							isCollapsed={isSidebarCollapsed}
-						/>
-					</nav>
-					<div className="border-t border-border p-3">
-						<Button
-							type="button"
-							variant="ghost"
-							className={cn(
-								"button-flat w-full gap-3 border-transparent normal-case tracking-normal dark:border-transparent",
-								isSidebarCollapsed ? "px-0" : "justify-start",
-							)}
-							aria-label={
-								isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
-							}
-							title={isSidebarCollapsed ? "Expand sidebar" : undefined}
-							onClick={() =>
-								setIsSidebarCollapsed((isCollapsed) => !isCollapsed)
-							}
-						>
-							{isSidebarCollapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
-							{!isSidebarCollapsed && <span>Collapse sidebar</span>}
-						</Button>
-					</div>
-				</aside>
+				{!isPublicPage && (
+					<aside
+						className={cn(
+							"sticky top-16 hidden h-[calc(100dvh-4rem)] shrink-0 border-r border-border bg-card transition-[width] duration-200 lg:flex lg:flex-col",
+							isSidebarCollapsed ? "w-20" : "w-64",
+						)}
+					>
+						<nav aria-label="Main navigation" className="flex-1 p-3">
+							<NavigationLinks
+								pathname={pathname}
+								isCollapsed={isSidebarCollapsed}
+							/>
+						</nav>
+						<div className="border-t border-border p-3">
+							<Button
+								type="button"
+								variant="ghost"
+								className={cn(
+									"button-flat w-full gap-3 border-transparent normal-case tracking-normal dark:border-transparent",
+									isSidebarCollapsed ? "px-0" : "justify-start",
+								)}
+								aria-label={
+									isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
+								}
+								title={isSidebarCollapsed ? "Expand sidebar" : undefined}
+								onClick={() =>
+									setIsSidebarCollapsed((isCollapsed) => !isCollapsed)
+								}
+							>
+								{isSidebarCollapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
+								{!isSidebarCollapsed && <span>Collapse sidebar</span>}
+							</Button>
+						</div>
+					</aside>
+				)}
 
 				<div className="min-w-0 flex-1">{children}</div>
 			</div>
@@ -173,7 +187,7 @@ function NavigationLinks({
 			{navigation.map((item) => {
 				const Icon = item.icon;
 				const isActive =
-					item.to === "/" ? pathname === item.to : pathname.startsWith(item.to);
+					pathname === item.to || pathname.startsWith(`${item.to}/`);
 
 				return (
 					<li key={item.to}>
