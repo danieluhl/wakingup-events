@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DesignRouteImport } from './routes/design'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as ApiAuthRouteImport } from './routes/api/auth'
 import { Route as ApiMeRouteImport } from './routes/api/me'
 import { Route as ApiWorkspacesRouteImport } from './routes/api/workspaces'
 import { Route as GroupsSlugRouteImport } from './routes/groups/$slug'
@@ -34,11 +33,6 @@ const DesignRoute = DesignRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthRoute = ApiAuthRouteImport.update({
-  id: '/api/auth',
-  path: '/api/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiMeRoute = ApiMeRouteImport.update({
@@ -81,7 +75,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
-  '/api/auth': typeof ApiAuthRouteWithChildren
   '/api/me': typeof ApiMeRoute
   '/api/workspaces': typeof ApiWorkspacesRouteWithChildren
   '/groups/$slug': typeof GroupsSlugRoute
@@ -94,7 +87,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
-  '/api/auth': typeof ApiAuthRouteWithChildren
   '/api/me': typeof ApiMeRoute
   '/api/workspaces': typeof ApiWorkspacesRouteWithChildren
   '/groups/$slug': typeof GroupsSlugRoute
@@ -108,7 +100,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
-  '/api/auth': typeof ApiAuthRouteWithChildren
   '/api/me': typeof ApiMeRoute
   '/api/workspaces': typeof ApiWorkspacesRouteWithChildren
   '/groups/$slug': typeof GroupsSlugRoute
@@ -123,7 +114,6 @@ export interface FileRouteTypes {
     | '/'
     | '/design'
     | '/login'
-    | '/api/auth'
     | '/api/me'
     | '/api/workspaces'
     | '/groups/$slug'
@@ -136,7 +126,6 @@ export interface FileRouteTypes {
     | '/'
     | '/design'
     | '/login'
-    | '/api/auth'
     | '/api/me'
     | '/api/workspaces'
     | '/groups/$slug'
@@ -149,7 +138,6 @@ export interface FileRouteTypes {
     | '/'
     | '/design'
     | '/login'
-    | '/api/auth'
     | '/api/me'
     | '/api/workspaces'
     | '/groups/$slug'
@@ -163,7 +151,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DesignRoute: typeof DesignRoute
   LoginRoute: typeof LoginRoute
-  ApiAuthRoute: typeof ApiAuthRouteWithChildren
   ApiMeRoute: typeof ApiMeRoute
   ApiWorkspacesRoute: typeof ApiWorkspacesRouteWithChildren
   GroupsSlugRoute: typeof GroupsSlugRoute
@@ -192,13 +179,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth': {
-      id: '/api/auth'
-      path: '/api/auth'
-      fullPath: '/api/auth'
-      preLoaderRoute: typeof ApiAuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/me': {
@@ -253,17 +233,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface ApiAuthRouteChildren {
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
-}
-
-const ApiAuthRouteChildren: ApiAuthRouteChildren = {
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
-}
-
-const ApiAuthRouteWithChildren =
-  ApiAuthRoute._addFileChildren(ApiAuthRouteChildren)
-
 interface ApiWorkspacesRouteChildren {
   ApiWorkspacesMembersRoute: typeof ApiWorkspacesMembersRoute
 }
@@ -280,7 +249,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DesignRoute: DesignRoute,
   LoginRoute: LoginRoute,
-  ApiAuthRoute: ApiAuthRouteWithChildren,
   ApiMeRoute: ApiMeRoute,
   ApiWorkspacesRoute: ApiWorkspacesRouteWithChildren,
   GroupsSlugRoute: GroupsSlugRoute,

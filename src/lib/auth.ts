@@ -1,4 +1,5 @@
 import { env } from "cloudflare:workers";
+import { dash } from "@better-auth/infra";
 import { betterAuth } from "better-auth";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 
@@ -10,5 +11,5 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
 	},
-	plugins: [tanstackStartCookies()],
+	plugins: [dash({ apiKey: env.BETTER_AUTH_API_KEY }), tanstackStartCookies()],
 });
