@@ -1,6 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { CircleAlert } from "lucide-react";
 import { type FormEvent, useEffect, useState } from "react";
+import { useGroup } from "#/components/group-context";
+import {
+	emptyMeetingAddress,
+	type MeetingAddressDraft,
+	MeetingAddressesEditor,
+} from "#/components/meeting-addresses-editor";
 import { Alert, AlertDescription } from "#/components/ui/alert";
 import { Badge } from "#/components/ui/badge";
 import { Button, buttonVariants } from "#/components/ui/button";
@@ -30,12 +36,16 @@ function toSlug(value: string) {
 
 function NewWorkspace() {
 	const navigate = useNavigate();
+	const { refreshGroups } = useGroup();
 	const { data: session, isPending: isSessionPending } =
 		authClient.useSession();
 	const [name, setName] = useState("");
 	const [slug, setSlug] = useState("");
 	const [isSlugEdited, setIsSlugEdited] = useState(false);
 	const [timezone, setTimezone] = useState("");
+	const [addresses, setAddresses] = useState<MeetingAddressDraft[]>([
+		emptyMeetingAddress(),
+	]);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -59,6 +69,7 @@ function NewWorkspace() {
 				region: String(formData.get("region")),
 				countryCode: String(formData.get("countryCode")),
 				timezone,
+				addresses,
 			}),
 		});
 		const result = (await response.json()) as {
@@ -76,6 +87,7 @@ function NewWorkspace() {
 			to: "/groups/$slug",
 			params: { slug: result.workspace.slug },
 		});
+		void refreshGroups();
 	};
 
 	if (isSessionPending) {
@@ -203,6 +215,19 @@ function NewWorkspace() {
 										required
 									/>
 								</div>
+							</div>
+							<div className="grid gap-3 pt-2">
+								<div>
+									<h2 className="font-medium">Meeting addresses</h2>
+									<p className="mt-1 text-sm text-muted-foreground">
+										Where does this group gather? Add at least one address.
+									</p>
+								</div>
+								<MeetingAddressesEditor
+									value={addresses}
+									onChange={setAddresses}
+									idPrefix="new"
+								/>
 							</div>
 							{error && (
 								<Alert variant="destructive">

@@ -31,12 +31,16 @@ test("an owner creates a group and is assigned the owner role", async ({
 	await page.getByLabel("State, province, or region").fill("California");
 	await page.getByLabel("Country code").fill("US");
 	await page.getByLabel("Timezone").fill("America/Los_Angeles");
+	await page.getByLabel("Street address").fill("123 Cedar Street");
+	await page.getByLabel("Meeting city").fill("Somerville");
+	await page.getByLabel("Address country").fill("US");
 	await page.getByRole("button", { name: "Create group" }).click();
 
 	await expect(page).toHaveURL(new RegExp(`/groups/${workspaceSlug}$`));
 	await expect(
 		page.getByRole("heading", { name: workspaceName }),
 	).toBeVisible();
+	await expect(page.getByText("123 Cedar Street")).toBeVisible();
 	await expect(
 		page.locator('[data-slot="badge"]').filter({ hasText: "owner" }),
 	).toBeVisible();

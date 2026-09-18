@@ -2,8 +2,10 @@ import { useRouterState } from "@tanstack/react-router";
 import {
 	createContext,
 	type ReactNode,
+	useCallback,
 	useContext,
 	useEffect,
+	useRef,
 	useState,
 } from "react";
 import { authClient } from "#/lib/auth-client";
@@ -23,6 +25,7 @@ interface GroupContextValue {
 	error: string | null;
 	hasRestorableSelection: boolean;
 	selectGroup: (group: GroupSummary) => void;
+	refreshGroups: () => Promise<void>;
 }
 
 const GroupContext = createContext<GroupContextValue | null>(null);
@@ -43,21 +46,19 @@ export function GroupProvider({ children }: { children: ReactNode }) {
 	const [isPending, setIsPending] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [hasRestorableSelection, setHasRestorableSelection] = useState(false);
+	const pathnameRef = useRef(pathname);
+	pathnameRef.current = pathname;
 
-	useEffect(() => {
-		if (!userId) {
-			setGroups([]);
-			setSelectedGroup(null);
+	const loadGroups = useCallback(
+		async (signal?: AbortSignal) => {
+			if (!userId) {
+				return;
+			}
+
+			setIsPending(true);
 			setError(null);
-			setHasRestorableSelection(false);
-			return;
-		}
-
-		const controller = new AbortController();
-		setIsPending(true);
-		setError(null);
-		void fetch("/api/workspaces", { signal: controller.signal })
-			.then(async (response) => {
+			try {
+				const response = await fetch("/api/workspaces", { signal });
 				const result = (await response.json()) as {
 					error?: string;
 					workspaces?: GroupSummary[];
@@ -65,16 +66,15 @@ export function GroupProvider({ children }: { children: ReactNode }) {
 				if (!response.ok || !result.workspaces) {
 					throw new Error(result.error ?? "Could not load your groups");
 				}
-				return result.workspaces;
-			})
-			.then((nextGroups) => {
+
+				const nextGroups = result.workspaces;
 				const storedGroupId = window.localStorage.getItem(
 					getStorageKey(userId),
 				);
 				const storedGroup = nextGroups.find(
 					(group) => group.id === storedGroupId,
 				);
-				const routeSlug = pathname.match(/^\/groups\/([^/]+)$/)?.[1];
+				const routeSlug = pathnameRef.current.match(/^\/groups\/([^/]+)$/)?.[1];
 				const routeGroup = nextGroups.find((group) => group.slug === routeSlug);
 				const nextSelection =
 					routeGroup ?? storedGroup ?? nextGroups[0] ?? null;
@@ -87,16 +87,48 @@ export function GroupProvider({ children }: { children: ReactNode }) {
 				} else {
 					window.localStorage.removeItem(getStorageKey(userId));
 				}
-			})
-			.catch((fetchError: unknown) => {
+			} catch (fetchError: unknown) {
 				if (fetchError instanceof Error && fetchError.name !== "AbortError") {
 					setError(fetchError.message);
 				}
-			})
-			.finally(() => setIsPending(false));
+			} finally {
+				setIsPending(false);
+			}
+		},
+		[userId],
+	);
+
+	useEffect(() => {
+		if (!userId) {
+			setGroups([]);
+			setSelectedGroup(null);
+			setError(null);
+			setHasRestorableSelection(false);
+			return;
+		}
+
+		const controller = new AbortController();
+		void loadGroups(controller.signal);
 
 		return () => controller.abort();
-	}, [pathname, userId]);
+	}, [userId, loadGroups]);
+
+	useEffect(() => {
+		const routeSlug = pathname.match(/^\/groups\/([^/]+)$/)?.[1];
+		if (!routeSlug || groups.length === 0) {
+			return;
+		}
+		const routeGroup = groups.find((group) => group.slug === routeSlug);
+		if (!routeGroup) {
+			return;
+		}
+		setSelectedGroup((current) =>
+			current?.id === routeGroup.id ? current : routeGroup,
+		);
+		if (userId) {
+			window.localStorage.setItem(getStorageKey(userId), routeGroup.id);
+		}
+	}, [pathname, groups, userId]);
 
 	const selectGroup = (group: GroupSummary) => {
 		setSelectedGroup(group);
@@ -104,6 +136,8 @@ export function GroupProvider({ children }: { children: ReactNode }) {
 			window.localStorage.setItem(getStorageKey(userId), group.id);
 		}
 	};
+
+	const refreshGroups = useCallback(() => loadGroups(), [loadGroups]);
 
 	return (
 		<GroupContext.Provider
@@ -114,6 +148,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
 				error,
 				hasRestorableSelection,
 				selectGroup,
+				refreshGroups,
 			}}
 		>
 			{children}

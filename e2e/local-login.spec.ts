@@ -23,7 +23,10 @@ test("creates a local account, signs out, and signs back in", async ({
 		page.getByRole("heading", { name: `Welcome, ${name}` }),
 	).toBeVisible();
 	await expect(
-		page.getByRole("main").getByText(email, { exact: true }),
+		page
+			.getByRole("heading", { name: `Welcome, ${name}` })
+			.locator("..")
+			.getByText(email, { exact: true }),
 	).toBeVisible();
 
 	await page.reload();
@@ -41,6 +44,9 @@ test("creates a local account, signs out, and signs back in", async ({
 	await page.getByLabel("State, province, or region").fill("Massachusetts");
 	await page.getByLabel("Country code").fill("US");
 	await page.getByLabel("Timezone").fill("America/New_York");
+	await page.getByLabel("Street address").fill("1 Central Square");
+	await page.getByLabel("Meeting city").fill("Cambridge");
+	await page.getByLabel("Address country").fill("US");
 	await page.getByRole("button", { name: "Create group" }).click();
 
 	await expect(page).toHaveURL(new RegExp(`/groups/${workspaceSlug}$`));

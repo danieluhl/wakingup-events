@@ -7,6 +7,11 @@ import {
 	Trash2,
 } from "lucide-react";
 import { type FormEvent, useEffect, useState } from "react";
+import {
+	type MeetingAddressDraft,
+	MeetingAddressesEditor,
+	meetingAddressesToDrafts,
+} from "#/components/meeting-addresses-editor";
 import { Alert, AlertDescription } from "#/components/ui/alert";
 import { Badge } from "#/components/ui/badge";
 import { Button, buttonVariants } from "#/components/ui/button";
@@ -22,6 +27,10 @@ import { Label } from "#/components/ui/label";
 import { Separator } from "#/components/ui/separator";
 import { Skeleton } from "#/components/ui/skeleton";
 import { authClient } from "#/lib/auth-client";
+import {
+	formatMeetingAddress,
+	type StoredMeetingAddress,
+} from "#/lib/workspace-addresses";
 
 interface WorkspaceDetails {
 	id: string;
@@ -34,6 +43,7 @@ interface WorkspaceDetails {
 	status: string;
 	createdAt: string;
 	role: string;
+	addresses: StoredMeetingAddress[];
 }
 
 export const Route = createFileRoute("/groups/$slug")({
@@ -149,6 +159,31 @@ function Workspace() {
 					</CardContent>
 					<Separator />
 					<CardContent className="px-6 py-7 sm:px-10">
+						<p className="island-kicker">Meeting locations</p>
+						<ul className="mt-3 grid gap-3 sm:grid-cols-2">
+							{workspace.addresses.map((address) => (
+								<li
+									key={address.id}
+									className="flex items-start gap-2 text-sm leading-6"
+								>
+									<MapPin
+										className="mt-1 size-4 shrink-0 text-muted-foreground"
+										aria-hidden="true"
+									/>
+									<span>
+										{address.label && (
+											<span className="font-medium">{address.label}</span>
+										)}
+										<span className="block text-muted-foreground">
+											{formatMeetingAddress(address)}
+										</span>
+									</span>
+								</li>
+							))}
+						</ul>
+					</CardContent>
+					<Separator />
+					<CardContent className="px-6 py-7 sm:px-10">
 						<p className="text-sm leading-6 text-muted-foreground">
 							Your role in this group is {workspace.role}. Event and community
 							tools can be added here as the local group takes shape.
@@ -182,6 +217,9 @@ function WorkspaceSettings({
 	const [region, setRegion] = useState(workspace.region ?? "");
 	const [countryCode, setCountryCode] = useState(workspace.countryCode);
 	const [timezone, setTimezone] = useState(workspace.timezone);
+	const [addresses, setAddresses] = useState<MeetingAddressDraft[]>(() =>
+		meetingAddressesToDrafts(workspace.addresses),
+	);
 	const [deleteConfirmation, setDeleteConfirmation] = useState("");
 	const [isSaving, setIsSaving] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -207,6 +245,7 @@ function WorkspaceSettings({
 						region,
 						countryCode,
 						timezone,
+						addresses,
 					}),
 				},
 			);
@@ -266,14 +305,19 @@ function WorkspaceSettings({
 	};
 
 	return (
-		<Card className="island-shell mt-8 rounded-2xl p-0">
+		<Card
+			id="group-settings"
+			className="island-shell mt-8 scroll-mt-24 rounded-2xl p-0"
+		>
 			<CardHeader className="border-b px-6 py-7 sm:px-10">
 				<div className="flex items-center gap-3">
 					<Settings
 						className="size-5 text-muted-foreground"
 						aria-hidden="true"
 					/>
-					<CardTitle>Group settings</CardTitle>
+					<CardTitle role="heading" aria-level={2}>
+						Group settings
+					</CardTitle>
 				</div>
 				<CardDescription>
 					Update how this group is named and located. These settings are
@@ -362,6 +406,20 @@ function WorkspaceSettings({
 								required
 							/>
 						</div>
+					</div>
+					<div className="grid gap-3 pt-2">
+						<div>
+							<h3 className="font-medium">Meeting addresses</h3>
+							<p className="mt-1 text-sm text-muted-foreground">
+								Keep every place this group gathers up to date. At least one
+								address is required.
+							</p>
+						</div>
+						<MeetingAddressesEditor
+							value={addresses}
+							onChange={setAddresses}
+							idPrefix="settings"
+						/>
 					</div>
 					{message && (
 						<Alert>

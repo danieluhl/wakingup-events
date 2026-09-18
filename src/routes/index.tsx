@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, CalendarDays, MapPin, Users } from "lucide-react";
+import { useEffect } from "react";
 import { buttonVariants } from "#/components/ui/button";
 import { Skeleton } from "#/components/ui/skeleton";
 import { authClient } from "#/lib/auth-client";
@@ -7,8 +8,24 @@ import { authClient } from "#/lib/auth-client";
 export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
+	const navigate = useNavigate();
 	const { data: session, isPending } = authClient.useSession();
-	const destination = session?.user ? "/home" : "/login";
+
+	useEffect(() => {
+		if (session?.user) {
+			void navigate({ to: "/home", replace: true });
+		}
+	}, [session, navigate]);
+
+	if (isPending || session?.user) {
+		return (
+			<main className="relative isolate min-h-[calc(100dvh-4rem)] bg-background px-6 py-16">
+				<div className="mx-auto max-w-4xl">
+					<Skeleton className="h-80 w-full rounded-2xl" />
+				</div>
+			</main>
+		);
+	}
 
 	return (
 		<main className="relative isolate min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground">
@@ -42,18 +59,12 @@ function Home() {
 					</p>
 
 					<div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-5">
-						{isPending ? (
-							<Skeleton className="h-13 w-44 rounded-none" />
-						) : (
-							<Link to={destination} className={buttonVariants({ size: "lg" })}>
-								{session?.user ? "Go to home" : "Sign in to begin"}
-								<ArrowRight className="ml-2 size-4" aria-hidden="true" />
-							</Link>
-						)}
+						<Link to="/login" className={buttonVariants({ size: "lg" })}>
+							Sign in to begin
+							<ArrowRight className="ml-2 size-4" aria-hidden="true" />
+						</Link>
 						<p className="max-w-52 text-sm leading-6 text-(--sea-ink-soft)">
-							{session?.user
-								? `Welcome back, ${session.user.name}.`
-								: "Your next gathering may be closer than you think."}
+							Your next gathering may be closer than you think.
 						</p>
 					</div>
 				</section>

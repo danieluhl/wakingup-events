@@ -48,6 +48,10 @@ export function getAssignableWorkspaceRoles(
 	);
 }
 
+export function canManageEvents(role: WorkspaceRole) {
+	return getWorkspaceRoleRank(role) >= getWorkspaceRoleRank("organizer");
+}
+
 export function canChangeWorkspaceRole(
 	actorRole: WorkspaceRole,
 	targetRole: WorkspaceRole,

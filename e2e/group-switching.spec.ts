@@ -7,6 +7,9 @@ async function createGroup(page: Page, name: string, slug: string) {
 	await page.getByLabel("State, province, or region").fill("Massachusetts");
 	await page.getByLabel("Country code").fill("US");
 	await page.getByLabel("Timezone").fill("America/New_York");
+	await page.getByLabel("Street address").fill("1 Central Square");
+	await page.getByLabel("Meeting city").fill("Cambridge");
+	await page.getByLabel("Address country").fill("US");
 	await page.getByRole("button", { name: "Create group" }).click();
 	await expect(page).toHaveURL(new RegExp(`/groups/${slug}$`));
 }
@@ -32,7 +35,12 @@ test("switches groups and restores the selected group on startup", async ({
 		.click();
 	await createGroup(page, "First Group", firstSlug);
 
-	await page.getByRole("link", { name: "Create group" }).click();
+	await page.getByRole("link", { name: "Groups" }).click();
+	await expect(page).toHaveURL(/\/groups\/?$/);
+	await page
+		.getByRole("main")
+		.getByRole("link", { name: "Create group" })
+		.click();
 	await createGroup(page, "Second Group", secondSlug);
 	const groupSwitcher = page.getByRole("button", {
 		name: /Second Group/,

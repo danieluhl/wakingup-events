@@ -13,13 +13,17 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DesignRouteImport } from './routes/design'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ApiEventsRouteImport } from './routes/api/events'
 import { Route as ApiMeRouteImport } from './routes/api/me'
 import { Route as ApiWorkspacesRouteImport } from './routes/api/workspaces'
+import { Route as GroupsIndexRouteImport } from './routes/groups/index'
 import { Route as GroupsSlugRouteImport } from './routes/groups/$slug'
 import { Route as GroupsNewRouteImport } from './routes/groups/new'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiWorkspacesMembersRouteImport } from './routes/api/workspaces/members'
+import { Route as GroupsSlugEventsRouteImport } from './routes/groups/$slug_.events'
 import { Route as GroupsSlugRolesRouteImport } from './routes/groups/$slug_.roles'
+import { Route as GroupsSlugEventsNewRouteImport } from './routes/groups/$slug_.events_.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -41,6 +45,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiEventsRoute = ApiEventsRouteImport.update({
+  id: '/api/events',
+  path: '/api/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiMeRoute = ApiMeRouteImport.update({
   id: '/api/me',
   path: '/api/me',
@@ -49,6 +58,11 @@ const ApiMeRoute = ApiMeRouteImport.update({
 const ApiWorkspacesRoute = ApiWorkspacesRouteImport.update({
   id: '/api/workspaces',
   path: '/api/workspaces',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GroupsIndexRoute = GroupsIndexRouteImport.update({
+  id: '/groups/',
+  path: '/groups/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GroupsSlugRoute = GroupsSlugRouteImport.update({
@@ -71,9 +85,19 @@ const ApiWorkspacesMembersRoute = ApiWorkspacesMembersRouteImport.update({
   path: '/members',
   getParentRoute: () => ApiWorkspacesRoute,
 } as any)
+const GroupsSlugEventsRoute = GroupsSlugEventsRouteImport.update({
+  id: '/groups/$slug_/events',
+  path: '/groups/$slug/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GroupsSlugRolesRoute = GroupsSlugRolesRouteImport.update({
   id: '/groups/$slug_/roles',
   path: '/groups/$slug/roles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GroupsSlugEventsNewRoute = GroupsSlugEventsNewRouteImport.update({
+  id: '/groups/$slug_/events_/new',
+  path: '/groups/$slug/events/new',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -82,26 +106,34 @@ export interface FileRoutesByFullPath {
   '/design': typeof DesignRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
+  '/api/events': typeof ApiEventsRoute
   '/api/me': typeof ApiMeRoute
   '/api/workspaces': typeof ApiWorkspacesRouteWithChildren
   '/groups/$slug': typeof GroupsSlugRoute
   '/groups/new': typeof GroupsNewRoute
+  '/groups/': typeof GroupsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/workspaces/members': typeof ApiWorkspacesMembersRoute
+  '/groups/$slug/events': typeof GroupsSlugEventsRoute
   '/groups/$slug/roles': typeof GroupsSlugRolesRoute
+  '/groups/$slug/events/new': typeof GroupsSlugEventsNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/design': typeof DesignRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
+  '/api/events': typeof ApiEventsRoute
   '/api/me': typeof ApiMeRoute
   '/api/workspaces': typeof ApiWorkspacesRouteWithChildren
   '/groups/$slug': typeof GroupsSlugRoute
   '/groups/new': typeof GroupsNewRoute
+  '/groups': typeof GroupsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/workspaces/members': typeof ApiWorkspacesMembersRoute
+  '/groups/$slug/events': typeof GroupsSlugEventsRoute
   '/groups/$slug/roles': typeof GroupsSlugRolesRoute
+  '/groups/$slug/events/new': typeof GroupsSlugEventsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -109,13 +141,17 @@ export interface FileRoutesById {
   '/design': typeof DesignRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
+  '/api/events': typeof ApiEventsRoute
   '/api/me': typeof ApiMeRoute
   '/api/workspaces': typeof ApiWorkspacesRouteWithChildren
   '/groups/$slug': typeof GroupsSlugRoute
   '/groups/new': typeof GroupsNewRoute
+  '/groups/': typeof GroupsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/workspaces/members': typeof ApiWorkspacesMembersRoute
+  '/groups/$slug_/events': typeof GroupsSlugEventsRoute
   '/groups/$slug_/roles': typeof GroupsSlugRolesRoute
+  '/groups/$slug_/events_/new': typeof GroupsSlugEventsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -124,39 +160,51 @@ export interface FileRouteTypes {
     | '/design'
     | '/home'
     | '/login'
+    | '/api/events'
     | '/api/me'
     | '/api/workspaces'
     | '/groups/$slug'
     | '/groups/new'
+    | '/groups/'
     | '/api/auth/$'
     | '/api/workspaces/members'
+    | '/groups/$slug/events'
     | '/groups/$slug/roles'
+    | '/groups/$slug/events/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/design'
     | '/home'
     | '/login'
+    | '/api/events'
     | '/api/me'
     | '/api/workspaces'
     | '/groups/$slug'
     | '/groups/new'
+    | '/groups'
     | '/api/auth/$'
     | '/api/workspaces/members'
+    | '/groups/$slug/events'
     | '/groups/$slug/roles'
+    | '/groups/$slug/events/new'
   id:
     | '__root__'
     | '/'
     | '/design'
     | '/home'
     | '/login'
+    | '/api/events'
     | '/api/me'
     | '/api/workspaces'
     | '/groups/$slug'
     | '/groups/new'
+    | '/groups/'
     | '/api/auth/$'
     | '/api/workspaces/members'
+    | '/groups/$slug_/events'
     | '/groups/$slug_/roles'
+    | '/groups/$slug_/events_/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -164,12 +212,16 @@ export interface RootRouteChildren {
   DesignRoute: typeof DesignRoute
   HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
+  ApiEventsRoute: typeof ApiEventsRoute
   ApiMeRoute: typeof ApiMeRoute
   ApiWorkspacesRoute: typeof ApiWorkspacesRouteWithChildren
   GroupsSlugRoute: typeof GroupsSlugRoute
   GroupsNewRoute: typeof GroupsNewRoute
+  GroupsIndexRoute: typeof GroupsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  GroupsSlugEventsRoute: typeof GroupsSlugEventsRoute
   GroupsSlugRolesRoute: typeof GroupsSlugRolesRoute
+  GroupsSlugEventsNewRoute: typeof GroupsSlugEventsNewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -202,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/events': {
+      id: '/api/events'
+      path: '/api/events'
+      fullPath: '/api/events'
+      preLoaderRoute: typeof ApiEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/me': {
       id: '/api/me'
       path: '/api/me'
@@ -214,6 +273,13 @@ declare module '@tanstack/react-router' {
       path: '/api/workspaces'
       fullPath: '/api/workspaces'
       preLoaderRoute: typeof ApiWorkspacesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/groups/': {
+      id: '/groups/'
+      path: '/groups'
+      fullPath: '/groups/'
+      preLoaderRoute: typeof GroupsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/groups/$slug': {
@@ -244,11 +310,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWorkspacesMembersRouteImport
       parentRoute: typeof ApiWorkspacesRoute
     }
+    '/groups/$slug_/events': {
+      id: '/groups/$slug_/events'
+      path: '/groups/$slug/events'
+      fullPath: '/groups/$slug/events'
+      preLoaderRoute: typeof GroupsSlugEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/groups/$slug_/roles': {
       id: '/groups/$slug_/roles'
       path: '/groups/$slug/roles'
       fullPath: '/groups/$slug/roles'
       preLoaderRoute: typeof GroupsSlugRolesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/groups/$slug_/events_/new': {
+      id: '/groups/$slug_/events_/new'
+      path: '/groups/$slug/events/new'
+      fullPath: '/groups/$slug/events/new'
+      preLoaderRoute: typeof GroupsSlugEventsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -271,12 +351,16 @@ const rootRouteChildren: RootRouteChildren = {
   DesignRoute: DesignRoute,
   HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
+  ApiEventsRoute: ApiEventsRoute,
   ApiMeRoute: ApiMeRoute,
   ApiWorkspacesRoute: ApiWorkspacesRouteWithChildren,
   GroupsSlugRoute: GroupsSlugRoute,
   GroupsNewRoute: GroupsNewRoute,
+  GroupsIndexRoute: GroupsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  GroupsSlugEventsRoute: GroupsSlugEventsRoute,
   GroupsSlugRolesRoute: GroupsSlugRolesRoute,
+  GroupsSlugEventsNewRoute: GroupsSlugEventsNewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

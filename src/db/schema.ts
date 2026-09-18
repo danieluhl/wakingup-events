@@ -105,6 +105,29 @@ export const workspaces = sqliteTable(
 	],
 );
 
+export const workspaceAddresses = sqliteTable(
+	"workspace_address",
+	{
+		id: text().primaryKey(),
+		workspaceId: text("workspace_id")
+			.notNull()
+			.references(() => workspaces.id, { onDelete: "cascade" }),
+		label: text(),
+		street: text().notNull(),
+		locality: text().notNull(),
+		region: text(),
+		postalCode: text("postal_code"),
+		countryCode: text("country_code").notNull(),
+		sortOrder: integer("sort_order").notNull().default(0),
+		createdAt: integer("created_at", { mode: "timestamp" })
+			.notNull()
+			.default(sql`(unixepoch())`),
+	},
+	(table) => [
+		index("workspace_address_workspace_id_idx").on(table.workspaceId),
+	],
+);
+
 export const workspaceMembers = sqliteTable(
 	"workspace_member",
 	{
@@ -179,6 +202,37 @@ export const workspaceSubscriptions = sqliteTable(
 	(table) => [
 		primaryKey({ columns: [table.workspaceId, table.userId] }),
 		index("workspace_subscription_user_id_idx").on(table.userId),
+	],
+);
+
+export const events = sqliteTable(
+	"event",
+	{
+		id: text().primaryKey(),
+		workspaceId: text("workspace_id")
+			.notNull()
+			.references(() => workspaces.id, { onDelete: "cascade" }),
+		title: text().notNull(),
+		startsAt: integer("starts_at", { mode: "timestamp" }).notNull(),
+		durationMinutes: integer("duration_minutes").notNull(),
+		location: text().notNull(),
+		organizerUserId: text("organizer_user_id")
+			.notNull()
+			.references(() => users.id),
+		createdByUserId: text("created_by_user_id")
+			.notNull()
+			.references(() => users.id),
+		createdAt: integer("created_at", { mode: "timestamp" })
+			.notNull()
+			.default(sql`(unixepoch())`),
+		updatedAt: integer("updated_at", { mode: "timestamp" })
+			.notNull()
+			.default(sql`(unixepoch())`),
+	},
+	(table) => [
+		index("event_workspace_id_idx").on(table.workspaceId),
+		index("event_starts_at_idx").on(table.workspaceId, table.startsAt),
+		check("event_duration_minutes_check", sql`${table.durationMinutes} > 0`),
 	],
 );
 

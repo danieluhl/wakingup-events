@@ -1,10 +1,11 @@
 import { env } from "cloudflare:workers";
 import { createFileRoute } from "@tanstack/react-router";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { z } from "zod";
-import { workspaceMembers, workspaces } from "#/db/schema";
+import { workspaceAddresses, workspaceMembers, workspaces } from "#/db/schema";
 import { auth } from "#/lib/auth";
+import { meetingAddressInput } from "#/lib/workspace-addresses";
 
 const workspaceInput = z.object({
 	name: z.string().trim().min(2).max(80),
@@ -18,10 +19,40 @@ const workspaceInput = z.object({
 	region: z.string().trim().max(100).optional(),
 	countryCode: z.string().trim().length(2).toUpperCase(),
 	timezone: z.string().trim().min(1).max(100),
+	addresses: z.array(meetingAddressInput).min(1).max(10),
 });
 
 async function getSession(request: Request) {
 	return auth.api.getSession({ headers: request.headers });
+}
+
+function workspaceInputError(error: z.ZodError) {
+	const hasAddressIssue = error.issues.some(
+		(issue) => issue.path[0] === "addresses",
+	);
+	if (hasAddressIssue) {
+		return "Add at least one complete meeting address";
+	}
+	return "Check the group details and try again";
+}
+
+async function getMeetingAddresses(
+	db: ReturnType<typeof drizzle>,
+	workspaceId: string,
+) {
+	return db
+		.select({
+			id: workspaceAddresses.id,
+			label: workspaceAddresses.label,
+			street: workspaceAddresses.street,
+			locality: workspaceAddresses.locality,
+			region: workspaceAddresses.region,
+			postalCode: workspaceAddresses.postalCode,
+			countryCode: workspaceAddresses.countryCode,
+		})
+		.from(workspaceAddresses)
+		.where(eq(workspaceAddresses.workspaceId, workspaceId))
+		.orderBy(asc(workspaceAddresses.sortOrder));
 }
 
 async function getWorkspaceAccess(request: Request) {
@@ -74,7 +105,9 @@ async function getWorkspaceAccess(request: Request) {
 		};
 	}
 
-	return { currentSession, db, workspace };
+	const addresses = await getMeetingAddresses(db, workspace.id);
+
+	return { currentSession, db, workspace: { ...workspace, addresses } };
 }
 
 const getWorkspace = async ({ request }: { request: Request }) => {
@@ -123,7 +156,7 @@ const createWorkspace = async ({ request }: { request: Request }) => {
 	const result = workspaceInput.safeParse(body);
 	if (!result.success) {
 		return Response.json(
-			{ error: "Check the group details and try again" },
+			{ error: workspaceInputError(result.error) },
 			{ status: 400 },
 		);
 	}
@@ -151,9 +184,21 @@ const createWorkspace = async ({ request }: { request: Request }) => {
 	}
 
 	const workspaceId = crypto.randomUUID();
+	const addresses = result.data.addresses.map((address, index) => ({
+		id: crypto.randomUUID(),
+		workspaceId,
+		label: address.label || null,
+		street: address.street,
+		locality: address.locality,
+		region: address.region || null,
+		postalCode: address.postalCode || null,
+		countryCode: address.countryCode,
+		sortOrder: index,
+	}));
+	const { addresses: _inputAddresses, ...workspaceFields } = result.data;
 	const workspace = {
 		id: workspaceId,
-		...result.data,
+		...workspaceFields,
 		region: result.data.region || null,
 		status: "active",
 		createdByUserId: currentSession.user.id,
@@ -167,6 +212,7 @@ const createWorkspace = async ({ request }: { request: Request }) => {
 				userId: currentSession.user.id,
 				role: "owner",
 			}),
+			db.insert(workspaceAddresses).values(addresses),
 		]);
 	} catch (error) {
 		if (error instanceof Error && error.message.includes("UNIQUE")) {
@@ -179,7 +225,7 @@ const createWorkspace = async ({ request }: { request: Request }) => {
 	}
 
 	return Response.json(
-		{ workspace: { ...workspace, role: "owner" } },
+		{ workspace: { ...workspace, addresses, role: "owner" } },
 		{ status: 201 },
 	);
 };
@@ -204,7 +250,7 @@ const updateWorkspace = async ({ request }: { request: Request }) => {
 	const result = workspaceInput.safeParse(body);
 	if (!result.success) {
 		return Response.json(
-			{ error: "Check the group details and try again" },
+			{ error: workspaceInputError(result.error) },
 			{ status: 400 },
 		);
 	}
@@ -244,6 +290,24 @@ const updateWorkspace = async ({ request }: { request: Request }) => {
 				{ status: 409 },
 			);
 		}
+
+		const addresses = result.data.addresses.map((address, index) => ({
+			id: crypto.randomUUID(),
+			workspaceId: access.workspace.id,
+			label: address.label || null,
+			street: address.street,
+			locality: address.locality,
+			region: address.region || null,
+			postalCode: address.postalCode || null,
+			countryCode: address.countryCode,
+			sortOrder: index,
+		}));
+		await access.db.batch([
+			access.db
+				.delete(workspaceAddresses)
+				.where(eq(workspaceAddresses.workspaceId, access.workspace.id)),
+			access.db.insert(workspaceAddresses).values(addresses),
+		]);
 	} catch (error) {
 		if (error instanceof Error && error.message.includes("UNIQUE")) {
 			return Response.json(
@@ -259,6 +323,7 @@ const updateWorkspace = async ({ request }: { request: Request }) => {
 			...access.workspace,
 			...result.data,
 			region: result.data.region || null,
+			addresses: await getMeetingAddresses(access.db, access.workspace.id),
 		},
 	});
 };
