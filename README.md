@@ -67,7 +67,8 @@ pnpm dlx shadcn@latest add button
 ## T3Env
 
 - You can use T3Env to add type safety to your environment variables.
-- Add Environment variables to the `src/env.mjs` file.
+- Environment specifications live in the `src/env.ts` file.
+- Add environment variables to the `src/env.ts` file.
 - Use the environment variables in your code.
 
 ### Usage

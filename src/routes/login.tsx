@@ -48,7 +48,7 @@ function Login() {
 			return;
 		}
 
-		await navigate({ to: "/dashboard" });
+		await navigate({ to: "/home" });
 	};
 
 	const handleGoogleSignIn = async () => {
@@ -57,7 +57,7 @@ function Login() {
 
 		const result = await authClient.signIn.social({
 			provider: "google",
-			callbackURL: "/dashboard",
+			callbackURL: "/home",
 		});
 
 		if (result.error) {
@@ -91,8 +91,8 @@ function Login() {
 						<CardTitle className="text-3xl">{session.user.email}</CardTitle>
 					</CardHeader>
 					<CardContent>
-						<Link to="/dashboard" className={buttonVariants()}>
-							Go to dashboard
+						<Link to="/home" className={buttonVariants()}>
+							Go to home
 						</Link>
 					</CardContent>
 				</Card>

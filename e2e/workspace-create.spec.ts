@@ -19,8 +19,11 @@ test("an owner creates a group and is assigned the owner role", async ({
 	await page.getByLabel("Password").fill(password);
 	await page.getByRole("button", { name: "Create account" }).click();
 
-	await expect(page).toHaveURL(/\/$/);
-	await page.getByRole("link", { name: "Create group" }).click();
+	await expect(page).toHaveURL(/\/home$/);
+	await page
+		.getByRole("main")
+		.getByRole("link", { name: "Create group" })
+		.click();
 
 	await page.getByLabel("Group name").fill(workspaceName);
 	await page.getByLabel("Group URL").fill(workspaceSlug);
@@ -40,4 +43,10 @@ test("an owner creates a group and is assigned the owner role", async ({
 	await expect(
 		page.getByText("Your role in this group is owner."),
 	).toBeVisible();
+
+	await page.getByRole("link", { name: "Home" }).first().click();
+	await expect(page).toHaveURL(/\/home$/);
+	await expect(
+		page.getByRole("main").getByRole("link", { name: "Create group" }),
+	).toHaveCount(0);
 });

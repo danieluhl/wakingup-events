@@ -51,18 +51,18 @@ function ComponentsGallery() {
 		<main className="page-wrap flex min-h-[calc(100dvh-4rem)] flex-col gap-12 py-16">
 			<div className="flex flex-col gap-6">
 				<Link
-					to="/"
-					className="w-fit text-sm text-[var(--sea-ink-soft)] hover:text-[var(--sea-ink)]"
+					to="/home"
+					className="w-fit text-sm text-(--sea-ink-soft) hover:text-(--sea-ink)"
 				>
 					← Back to homepage
 				</Link>
 				<header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 					<div>
 						<p className="island-kicker">Design draft — components</p>
-						<h1 className="display-title mt-2 text-4xl font-bold text-[var(--sea-ink)]">
+						<h1 className="display-title mt-2 text-4xl font-bold text-(--sea-ink)">
 							ShadCN components
 						</h1>
-						<p className="mt-3 max-w-2xl text-[var(--sea-ink-soft)]">
+						<p className="mt-3 max-w-2xl text-(--sea-ink-soft)">
 							A living reference of every ShadCN component in use, rendered with
 							the app's design tokens. Hover the buttons to see their active
 							states.
@@ -77,7 +77,7 @@ function ComponentsGallery() {
 			<Card className="island-shell rounded-2xl p-0">
 				<CardHeader className="px-6 pt-6 sm:px-10 sm:pt-10">
 					<CardTitle className="island-kicker">Button — variants</CardTitle>
-					<CardDescription className="text-sm text-[var(--sea-ink-soft)]">
+					<CardDescription className="text-sm text-(--sea-ink-soft)">
 						Each variant includes a resting and a disabled example.
 					</CardDescription>
 				</CardHeader>
@@ -108,7 +108,7 @@ function ComponentsGallery() {
 			<Card className="island-shell rounded-2xl p-0">
 				<CardHeader className="px-6 pt-6 sm:px-10 sm:pt-10">
 					<CardTitle className="island-kicker">Button — sizes</CardTitle>
-					<CardDescription className="text-sm text-[var(--sea-ink-soft)]">
+					<CardDescription className="text-sm text-(--sea-ink-soft)">
 						Default, small, large, and icon.
 					</CardDescription>
 				</CardHeader>
@@ -127,13 +127,13 @@ function ComponentsGallery() {
 			<Card className="island-shell rounded-2xl p-0">
 				<CardHeader className="px-6 pt-6 sm:px-10 sm:pt-10">
 					<CardTitle className="island-kicker">Button — as a link</CardTitle>
-					<CardDescription className="text-sm text-[var(--sea-ink-soft)]">
+					<CardDescription className="text-sm text-(--sea-ink-soft)">
 						The same button styling, applied to a route link.
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="px-6 pb-6 sm:px-10 sm:pb-10">
 					<div className="flex flex-wrap items-center gap-4">
-						<Link to="/" className={buttonVariants()}>
+						<Link to="/home" className={buttonVariants()}>
 							Back to home
 						</Link>
 						<Link
@@ -149,7 +149,7 @@ function ComponentsGallery() {
 			<Card className="island-shell rounded-2xl p-0">
 				<CardHeader className="px-6 pt-6 sm:px-10 sm:pt-10">
 					<CardTitle className="island-kicker">Form controls</CardTitle>
-					<CardDescription className="text-sm text-[var(--sea-ink-soft)]">
+					<CardDescription className="text-sm text-(--sea-ink-soft)">
 						Labels and inputs in common states.
 					</CardDescription>
 				</CardHeader>
@@ -180,7 +180,7 @@ function ComponentsGallery() {
 			<Card className="island-shell rounded-2xl p-0">
 				<CardHeader className="px-6 pt-6 sm:px-10 sm:pt-10">
 					<CardTitle className="island-kicker">Status and feedback</CardTitle>
-					<CardDescription className="text-sm text-[var(--sea-ink-soft)]">
+					<CardDescription className="text-sm text-(--sea-ink-soft)">
 						Badge variants and alert treatments.
 					</CardDescription>
 				</CardHeader>
@@ -215,7 +215,7 @@ function ComponentsGallery() {
 			<Card className="island-shell rounded-2xl p-0">
 				<CardHeader className="px-6 pt-6 sm:px-10 sm:pt-10">
 					<CardTitle className="island-kicker">Identity and loading</CardTitle>
-					<CardDescription className="text-sm text-[var(--sea-ink-soft)]">
+					<CardDescription className="text-sm text-(--sea-ink-soft)">
 						Avatars, separators, and loading placeholders.
 					</CardDescription>
 				</CardHeader>

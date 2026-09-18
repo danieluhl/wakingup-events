@@ -14,7 +14,7 @@ export function NotFound() {
 				Sorry, we couldn't find what you're looking for. It may have been moved
 				or doesn't exist anymore.
 			</p>
-			<Link to="/" className={buttonVariants()}>
+			<Link to="/home" className={buttonVariants()}>
 				Back to home
 			</Link>
 		</div>

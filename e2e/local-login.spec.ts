@@ -9,7 +9,7 @@ test("creates a local account, signs out, and signs back in", async ({
 	const workspaceSlug = `playwright-${crypto.randomUUID()}`;
 
 	await page.goto("/");
-	await page.getByRole("link", { name: "Sign in" }).click();
+	await page.getByRole("link", { name: "Sign in", exact: true }).click();
 	await expect(page).toHaveURL(/\/login$/);
 
 	await page.getByRole("button", { name: "Create a new account" }).click();
@@ -18,20 +18,23 @@ test("creates a local account, signs out, and signs back in", async ({
 	await page.getByLabel("Password").fill(password);
 	await page.getByRole("button", { name: "Create account" }).click();
 
-	await expect(page).toHaveURL(/\/$/);
+	await expect(page).toHaveURL(/\/home$/);
 	await expect(
-		page.getByRole("heading", { name: `Hello, ${name}` }),
+		page.getByRole("heading", { name: `Welcome, ${name}` }),
 	).toBeVisible();
-	await expect(page.getByText(email, { exact: true })).toBeVisible();
-	await expect(page.locator("pre")).toContainText(email);
-	await expect(page.locator("pre")).toContainText('"providerId": "credential"');
+	await expect(
+		page.getByRole("main").getByText(email, { exact: true }),
+	).toBeVisible();
 
 	await page.reload();
 	await expect(
-		page.getByRole("heading", { name: `Hello, ${name}` }),
+		page.getByRole("heading", { name: `Welcome, ${name}` }),
 	).toBeVisible();
 
-	await page.getByRole("link", { name: "Create group" }).click();
+	await page
+		.getByRole("main")
+		.getByRole("link", { name: "Create group" })
+		.click();
 	await page.getByLabel("Group name").fill("Boston");
 	await page.getByLabel("Group URL").fill(workspaceSlug);
 	await page.getByLabel("City or locality").fill("Boston");
@@ -43,17 +46,13 @@ test("creates a local account, signs out, and signs back in", async ({
 	await expect(page).toHaveURL(new RegExp(`/groups/${workspaceSlug}$`));
 	await expect(page.getByText("owner", { exact: true })).toBeVisible();
 	await expect(page.getByRole("heading", { name: "Boston" })).toBeVisible();
-	await page.getByRole("link", { name: "Back to home" }).click();
 
-	await page.getByRole("button", { name: "Sign out" }).click();
-	await page.getByRole("link", { name: "Sign in" }).click();
+	await page.getByRole("button", { name: "Open user menu" }).click();
+	await page.getByRole("menuitem", { name: "Sign out" }).click();
+	await page.getByRole("link", { name: "Sign in", exact: true }).click();
 	await page.getByLabel("Email").fill(email);
 	await page.getByLabel("Password").fill(password);
 	await page.getByRole("button", { name: "Sign in", exact: true }).click();
 
-	await expect(page).toHaveURL(/\/$/);
-	await expect(
-		page.getByRole("heading", { name: `Hello, ${name}` }),
-	).toBeVisible();
-	await expect(page.locator("pre")).toContainText(email);
+	await expect(page).toHaveURL(new RegExp(`/groups/${workspaceSlug}$`));
 });

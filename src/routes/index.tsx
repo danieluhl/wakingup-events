@@ -8,7 +8,7 @@ export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
 	const { data: session, isPending } = authClient.useSession();
-	const destination = session?.user ? "/dashboard" : "/login";
+	const destination = session?.user ? "/home" : "/login";
 
 	return (
 		<main className="relative isolate min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground">
@@ -46,7 +46,7 @@ function Home() {
 							<Skeleton className="h-13 w-44 rounded-none" />
 						) : (
 							<Link to={destination} className={buttonVariants({ size: "lg" })}>
-								{session?.user ? "Go to dashboard" : "Sign in to begin"}
+								{session?.user ? "Go to home" : "Sign in to begin"}
 								<ArrowRight className="ml-2 size-4" aria-hidden="true" />
 							</Link>
 						)}

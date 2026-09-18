@@ -1,14 +1,12 @@
-import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import {
 	createRootRouteWithContext,
 	HeadContent,
 	Scripts,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { AppShell } from "#/components/app-shell";
+import { GroupProvider } from "#/components/group-context";
 import { TooltipProvider } from "#/components/ui/tooltip";
-import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
 
 interface MyRouterContext {
@@ -16,9 +14,20 @@ interface MyRouterContext {
 }
 
 const themeScript = `(() => {
+	const key = "theme";
+	const storage = window.localStorage;
 	const preference = window.matchMedia("(prefers-color-scheme: dark)");
-	const applyTheme = ({ matches }) => document.documentElement.classList.toggle("dark", matches);
-	applyTheme(preference);
+	const applyTheme = () => {
+		const stored = storage.getItem(key);
+		const theme =
+			stored === "light" || stored === "dark" || stored === "system"
+				? stored
+				: "system";
+		const isDark =
+			theme === "system" ? preference.matches : theme === "dark";
+		document.documentElement.classList.toggle("dark", isDark);
+	};
+	applyTheme();
 	preference.addEventListener("change", applyTheme);
 })();`;
 
@@ -60,20 +69,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body>
 				<TooltipProvider>
-					<AppShell>{children}</AppShell>
+					<GroupProvider>
+						<AppShell>{children}</AppShell>
+					</GroupProvider>
 				</TooltipProvider>
-				<TanStackDevtools
-					config={{
-						position: "bottom-right",
-					}}
-					plugins={[
-						{
-							name: "Tanstack Router",
-							render: <TanStackRouterDevtoolsPanel />,
-						},
-						TanStackQueryDevtools,
-					]}
-				/>
 				<Scripts />
 			</body>
 		</html>

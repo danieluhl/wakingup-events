@@ -10,8 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DesignRouteImport } from './routes/design'
+import { Route as HomeRouteImport } from './routes/home'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ApiMeRouteImport } from './routes/api/me'
 import { Route as ApiWorkspacesRouteImport } from './routes/api/workspaces'
@@ -26,14 +26,14 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DesignRoute = DesignRouteImport.update({
   id: '/design',
   path: '/design',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -79,8 +79,8 @@ const GroupsSlugRolesRoute = GroupsSlugRolesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
   '/design': typeof DesignRoute
+  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/api/me': typeof ApiMeRoute
   '/api/workspaces': typeof ApiWorkspacesRouteWithChildren
@@ -92,8 +92,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
   '/design': typeof DesignRoute
+  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/api/me': typeof ApiMeRoute
   '/api/workspaces': typeof ApiWorkspacesRouteWithChildren
@@ -106,8 +106,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
   '/design': typeof DesignRoute
+  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/api/me': typeof ApiMeRoute
   '/api/workspaces': typeof ApiWorkspacesRouteWithChildren
@@ -121,8 +121,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/dashboard'
     | '/design'
+    | '/home'
     | '/login'
     | '/api/me'
     | '/api/workspaces'
@@ -134,8 +134,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/dashboard'
     | '/design'
+    | '/home'
     | '/login'
     | '/api/me'
     | '/api/workspaces'
@@ -147,8 +147,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/dashboard'
     | '/design'
+    | '/home'
     | '/login'
     | '/api/me'
     | '/api/workspaces'
@@ -161,8 +161,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DashboardRoute: typeof DashboardRoute
   DesignRoute: typeof DesignRoute
+  HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
   ApiMeRoute: typeof ApiMeRoute
   ApiWorkspacesRoute: typeof ApiWorkspacesRouteWithChildren
@@ -181,18 +181,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/design': {
       id: '/design'
       path: '/design'
       fullPath: '/design'
       preLoaderRoute: typeof DesignRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -268,8 +268,8 @@ const ApiWorkspacesRouteWithChildren = ApiWorkspacesRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DashboardRoute: DashboardRoute,
   DesignRoute: DesignRoute,
+  HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
   ApiMeRoute: ApiMeRoute,
   ApiWorkspacesRoute: ApiWorkspacesRouteWithChildren,
