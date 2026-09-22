@@ -40,9 +40,6 @@ test("creates a local account, signs out, and signs back in", async ({
 		.click();
 	await page.getByLabel("Group name").fill("Boston");
 	await page.getByLabel("Group URL").fill(workspaceSlug);
-	await page.getByLabel("City or locality").fill("Boston");
-	await page.getByLabel("State, province, or region").fill("Massachusetts");
-	await page.getByLabel("Country code").fill("US");
 	await page.getByLabel("Timezone").fill("America/New_York");
 	await page.getByLabel("Street address").fill("1 Central Square");
 	await page.getByLabel("Meeting city").fill("Cambridge");
@@ -55,6 +52,7 @@ test("creates a local account, signs out, and signs back in", async ({
 
 	await page.getByRole("button", { name: "Open user menu" }).click();
 	await page.getByRole("menuitem", { name: "Sign out" }).click();
+	await expect(page).toHaveURL(/localhost:3000\/$/);
 	await page.getByRole("link", { name: "Sign in", exact: true }).click();
 	await page.getByLabel("Email").fill(email);
 	await page.getByLabel("Password").fill(password);

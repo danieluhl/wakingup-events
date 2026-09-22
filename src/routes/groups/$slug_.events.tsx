@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	CalendarDays,
+	CalendarPlus,
 	CircleAlert,
 	Clock,
+	ExternalLink,
 	MapPin,
 	Plus,
 	UserRound,
@@ -10,7 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "#/components/ui/alert";
 import { Badge } from "#/components/ui/badge";
-import { buttonVariants } from "#/components/ui/button";
+import { Button, buttonVariants } from "#/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -27,6 +29,12 @@ import {
 	type WorkspaceEvent,
 } from "#/lib/events";
 
+interface CalendarLinks {
+	embedUrl: string;
+	subscribeUrl: string;
+	addUrl: string;
+}
+
 interface EventsData {
 	workspace: {
 		id: string;
@@ -36,6 +44,7 @@ interface EventsData {
 		role: string;
 	};
 	events: WorkspaceEvent[];
+	calendar: CalendarLinks | null;
 }
 
 export const Route = createFileRoute("/groups/$slug_/events")({
@@ -48,6 +57,8 @@ function WorkspaceEvents() {
 		authClient.useSession();
 	const [data, setData] = useState<EventsData | null>(null);
 	const [error, setError] = useState<string | null>(null);
+	const [calendarError, setCalendarError] = useState<string | null>(null);
+	const [isSettingUpCalendar, setIsSettingUpCalendar] = useState(false);
 
 	useEffect(() => {
 		if (!session?.user) return;
@@ -64,13 +75,18 @@ function WorkspaceEvents() {
 					error?: string;
 					workspace?: EventsData["workspace"];
 					events?: WorkspaceEvent[];
+					calendar?: CalendarLinks | null;
 				};
 
 				if (!response.ok || !result.workspace || !result.events) {
 					throw new Error(result.error ?? "Could not load events");
 				}
 
-				return { workspace: result.workspace, events: result.events };
+				return {
+					workspace: result.workspace,
+					events: result.events,
+					calendar: result.calendar ?? null,
+				};
 			})
 			.then(setData)
 			.catch((fetchError: unknown) => {
@@ -126,7 +142,40 @@ function WorkspaceEvents() {
 		);
 	}
 
-	const { workspace, events } = data;
+	const { workspace, events, calendar } = data;
+	const webcalUrl = calendar?.subscribeUrl.replace(/^https?:/, "webcal:");
+	const canSetUpCalendar =
+		workspace.role === "owner" || workspace.role === "admin";
+
+	async function setUpCalendar() {
+		setIsSettingUpCalendar(true);
+		setCalendarError(null);
+		try {
+			const response = await fetch(
+				`/api/workspaces/calendar?slug=${encodeURIComponent(slug)}`,
+				{ method: "POST" },
+			);
+			const result = (await response.json()) as {
+				error?: string;
+				calendar?: CalendarLinks;
+			};
+			if (!response.ok || !result.calendar) {
+				throw new Error(result.error ?? "Could not set up the calendar");
+			}
+			const nextCalendar = result.calendar;
+			setData((previous) =>
+				previous ? { ...previous, calendar: nextCalendar } : previous,
+			);
+		} catch (setupError) {
+			setCalendarError(
+				setupError instanceof Error
+					? setupError.message
+					: "Could not set up the calendar",
+			);
+		} finally {
+			setIsSettingUpCalendar(false);
+		}
+	}
 
 	return (
 		<main className="page-wrap min-h-[calc(100dvh-4rem)] py-10 sm:py-16">
@@ -191,6 +240,72 @@ function WorkspaceEvents() {
 						)}
 					</CardContent>
 				</Card>
+
+				{calendar ? (
+					<Card className="island-shell overflow-hidden rounded-2xl p-0">
+						<CardHeader className="px-6 pt-7 sm:px-9 sm:pt-9">
+							<CardTitle>Calendar</CardTitle>
+							<CardDescription>
+								Subscribe to the {workspace.name} calendar, or add it to Google
+								Calendar.
+							</CardDescription>
+						</CardHeader>
+						<CardContent className="grid gap-5 px-6 pb-7 sm:px-9 sm:pb-9">
+							<div className="flex flex-wrap gap-3">
+								<a
+									href={calendar.addUrl}
+									target="_blank"
+									rel="noreferrer"
+									className={buttonVariants()}
+								>
+									<CalendarPlus aria-hidden="true" />
+									Add to Google Calendar
+								</a>
+								<a
+									href={webcalUrl}
+									className={buttonVariants({ variant: "outline" })}
+								>
+									<ExternalLink aria-hidden="true" />
+									Subscribe
+								</a>
+							</div>
+							<iframe
+								title={`${workspace.name} calendar`}
+								src={calendar.embedUrl}
+								loading="lazy"
+								className="h-[600px] w-full rounded-xl border"
+							/>
+						</CardContent>
+					</Card>
+				) : (
+					<Card className="island-shell rounded-2xl">
+						<CardHeader>
+							<CardTitle>Calendar</CardTitle>
+							<CardDescription>
+								{canSetUpCalendar
+									? `Create a public Google Calendar for ${workspace.name} that people can subscribe to and add to their own calendar.`
+									: "An owner or admin can set up a shared calendar for this group."}
+							</CardDescription>
+						</CardHeader>
+						{canSetUpCalendar && (
+							<CardContent className="grid gap-3">
+								<div>
+									<Button
+										type="button"
+										onClick={setUpCalendar}
+										disabled={isSettingUpCalendar}
+									>
+										<CalendarPlus aria-hidden="true" />
+										{isSettingUpCalendar ? "Setting up…" : "Set up calendar"}
+									</Button>
+								</div>
+								{calendarError && (
+									<p className="text-sm text-destructive">{calendarError}</p>
+								)}
+							</CardContent>
+						)}
+					</Card>
+				)}
 			</div>
 		</main>
 	);

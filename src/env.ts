@@ -14,8 +14,13 @@ const runtimeEnv: Record<string, string | boolean | number | undefined> = {
 	DATABASE_URL: workerEnv.DATABASE_URL,
 	GOOGLE_CLIENT_ID: workerEnv.GOOGLE_CLIENT_ID,
 	GOOGLE_CLIENT_SECRET: workerEnv.GOOGLE_CLIENT_SECRET,
+	GOOGLE_CALENDAR_CLIENT_ID: workerEnv.GOOGLE_CALENDAR_CLIENT_ID,
+	GOOGLE_CALENDAR_CLIENT_SECRET: workerEnv.GOOGLE_CALENDAR_CLIENT_SECRET,
+	GOOGLE_CALENDAR_REFRESH_TOKEN: workerEnv.GOOGLE_CALENDAR_REFRESH_TOKEN,
+	GOOGLE_MAPS_API_KEY: workerEnv.GOOGLE_MAPS_API_KEY,
 	SERVER_URL: workerEnv.SERVER_URL,
 	VITE_APP_TITLE: import.meta.env.VITE_APP_TITLE,
+	VITE_GOOGLE_MAPS_API_KEY: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
 };
 
 export const env = createEnv({
@@ -26,6 +31,10 @@ export const env = createEnv({
 		DATABASE_URL: z.string().min(1).optional(),
 		GOOGLE_CLIENT_ID: z.string().min(1),
 		GOOGLE_CLIENT_SECRET: z.string().min(1),
+		GOOGLE_CALENDAR_CLIENT_ID: z.string().min(1).optional(),
+		GOOGLE_CALENDAR_CLIENT_SECRET: z.string().min(1).optional(),
+		GOOGLE_CALENDAR_REFRESH_TOKEN: z.string().min(1).optional(),
+		GOOGLE_MAPS_API_KEY: z.string().min(1).optional(),
 		SERVER_URL: z.string().url().optional(),
 	},
 
@@ -37,6 +46,7 @@ export const env = createEnv({
 
 	client: {
 		VITE_APP_TITLE: z.string().min(1).optional(),
+		VITE_GOOGLE_MAPS_API_KEY: z.string().min(1).optional(),
 	},
 
 	runtimeEnv,

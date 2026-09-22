@@ -3,9 +3,6 @@ import { expect, type Page, test } from "@playwright/test";
 async function createGroup(page: Page, name: string, slug: string) {
 	await page.getByLabel("Group name").fill(name);
 	await page.getByLabel("Group URL").fill(slug);
-	await page.getByLabel("City or locality").fill("Boston");
-	await page.getByLabel("State, province, or region").fill("Massachusetts");
-	await page.getByLabel("Country code").fill("US");
 	await page.getByLabel("Timezone").fill("America/New_York");
 	await page.getByLabel("Street address").fill("1 Central Square");
 	await page.getByLabel("Meeting city").fill("Cambridge");

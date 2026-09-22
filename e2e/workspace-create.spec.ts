@@ -27,9 +27,6 @@ test("an owner creates a group and is assigned the owner role", async ({
 
 	await page.getByLabel("Group name").fill(workspaceName);
 	await page.getByLabel("Group URL").fill(workspaceSlug);
-	await page.getByLabel("City or locality").fill("Halcyon");
-	await page.getByLabel("State, province, or region").fill("California");
-	await page.getByLabel("Country code").fill("US");
 	await page.getByLabel("Timezone").fill("America/Los_Angeles");
 	await page.getByLabel("Street address").fill("123 Cedar Street");
 	await page.getByLabel("Meeting city").fill("Somerville");

@@ -16,9 +16,6 @@ test("an owner updates and deletes a group", async ({ page }) => {
 	await page.goto("/groups/new");
 	await page.getByLabel("Group name").fill("Settings Group");
 	await page.getByLabel("Group URL").fill(workspaceSlug);
-	await page.getByLabel("City or locality").fill("Portland");
-	await page.getByLabel("State, province, or region").fill("Oregon");
-	await page.getByLabel("Country code").fill("US");
 	await page.getByLabel("Timezone").fill("America/Los_Angeles");
 	await page.getByLabel("Street address").fill("120 SW Main Street");
 	await page.getByLabel("Meeting city").fill("Portland");
@@ -41,7 +38,6 @@ test("an owner updates and deletes a group", async ({ page }) => {
 	).toBeVisible();
 	await page.getByLabel("Group name").fill("Updated Settings Group");
 	await page.getByLabel("Group URL").fill(updatedSlug);
-	await page.getByLabel("City or locality").fill("Seattle");
 	await page.getByLabel("Street address").fill("9 Pike Place");
 	await page.getByLabel("Meeting city").fill("Seattle");
 	await page

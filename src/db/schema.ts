@@ -4,6 +4,7 @@ import {
 	index,
 	integer,
 	primaryKey,
+	real,
 	sqliteTable,
 	text,
 	uniqueIndex,
@@ -85,6 +86,7 @@ export const workspaces = sqliteTable(
 		region: text(),
 		countryCode: text("country_code").notNull(),
 		timezone: text().notNull(),
+		googleCalendarId: text("google_calendar_id"),
 		status: text().notNull().default("active"),
 		createdByUserId: text("created_by_user_id")
 			.notNull()
@@ -118,6 +120,8 @@ export const workspaceAddresses = sqliteTable(
 		region: text(),
 		postalCode: text("postal_code"),
 		countryCode: text("country_code").notNull(),
+		latitude: real(),
+		longitude: real(),
 		sortOrder: integer("sort_order").notNull().default(0),
 		createdAt: integer("created_at", { mode: "timestamp" })
 			.notNull()
@@ -216,6 +220,7 @@ export const events = sqliteTable(
 		startsAt: integer("starts_at", { mode: "timestamp" }).notNull(),
 		durationMinutes: integer("duration_minutes").notNull(),
 		location: text().notNull(),
+		googleEventId: text("google_event_id"),
 		organizerUserId: text("organizer_user_id")
 			.notNull()
 			.references(() => users.id),

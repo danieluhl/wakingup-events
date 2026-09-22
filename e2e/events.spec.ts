@@ -15,9 +15,6 @@ test("an owner adds an event and sees it listed", async ({ page }) => {
 	await page.goto("/groups/new");
 	await page.getByLabel("Group name").fill("Events Group");
 	await page.getByLabel("Group URL").fill(workspaceSlug);
-	await page.getByLabel("City or locality").fill("Cambridge");
-	await page.getByLabel("State, province, or region").fill("Massachusetts");
-	await page.getByLabel("Country code").fill("US");
 	await page.getByLabel("Timezone").fill("America/New_York");
 	await page.getByLabel("Street address").fill("1 Central Square");
 	await page.getByLabel("Meeting city").fill("Cambridge");

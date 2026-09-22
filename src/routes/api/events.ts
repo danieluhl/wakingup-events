@@ -5,6 +5,11 @@ import { drizzle } from "drizzle-orm/d1";
 import { events, users, workspaceMembers, workspaces } from "#/db/schema";
 import { auth } from "#/lib/auth";
 import { eventInput } from "#/lib/events";
+import {
+	createCalendarEvent,
+	getGoogleCalendarUrls,
+	isGoogleCalendarConfigured,
+} from "#/lib/google-calendar";
 import { canManageEvents, isWorkspaceRole } from "#/lib/workspace-roles";
 
 async function getEventAccess(request: Request) {
@@ -34,6 +39,7 @@ async function getEventAccess(request: Request) {
 			name: workspaces.name,
 			slug: workspaces.slug,
 			timezone: workspaces.timezone,
+			googleCalendarId: workspaces.googleCalendarId,
 			role: workspaceMembers.role,
 		})
 		.from(workspaces)
@@ -85,9 +91,17 @@ const getEvents = async ({ request }: { request: Request }) => {
 		.where(eq(events.workspaceId, access.workspace.id))
 		.orderBy(asc(events.startsAt), asc(events.id));
 
+	const calendar = access.workspace.googleCalendarId
+		? getGoogleCalendarUrls(
+				access.workspace.googleCalendarId,
+				access.workspace.timezone,
+			)
+		: null;
+
 	return Response.json({
 		workspace: access.workspace,
 		events: eventRows,
+		calendar,
 	});
 };
 
@@ -158,6 +172,32 @@ const createEvent = async ({ request }: { request: Request }) => {
 	};
 
 	await access.db.insert(events).values(event);
+
+	if (isGoogleCalendarConfigured() && access.workspace.googleCalendarId) {
+		try {
+			const googleEventId = await createCalendarEvent(
+				access.workspace.googleCalendarId,
+				{
+					title: event.title,
+					startsAt,
+					durationMinutes: event.durationMinutes,
+					location: event.location,
+					description: `Hosted by ${organizer.name} for ${access.workspace.name}.`,
+					timeZone: access.workspace.timezone,
+				},
+			);
+			await access.db
+				.update(events)
+				.set({ googleEventId })
+				.where(eq(events.id, event.id));
+		} catch (error) {
+			console.error(
+				"Could not add this event to the group calendar",
+				event.id,
+				error,
+			);
+		}
+	}
 
 	return Response.json(
 		{

@@ -1,4 +1,9 @@
-import { CircleMinus, Plus } from "lucide-react";
+import { CircleMinus, MapPin, Plus } from "lucide-react";
+import { useState } from "react";
+import {
+	MeetingAddressMapPicker,
+	type PickedAddress,
+} from "#/components/meeting-address-map-picker";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
@@ -32,7 +37,7 @@ export function emptyMeetingAddress(
 export function meetingAddressesToDrafts(
 	addresses: StoredMeetingAddress[],
 ): MeetingAddressDraft[] {
-	const drafts = addresses.map((address) =>
+	return addresses.map((address) =>
 		emptyMeetingAddress({
 			label: address.label ?? "",
 			street: address.street,
@@ -42,7 +47,6 @@ export function meetingAddressesToDrafts(
 			countryCode: address.countryCode,
 		}),
 	);
-	return drafts.length > 0 ? drafts : [emptyMeetingAddress()];
 }
 
 type AddressField = Exclude<keyof MeetingAddressDraft, "id">;
@@ -106,10 +110,30 @@ export function MeetingAddressesEditor({
 	onChange: (value: MeetingAddressDraft[]) => void;
 	idPrefix: string;
 }) {
+	const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+	const [pickerIndex, setPickerIndex] = useState<number | null>(null);
+
 	const updateField = (index: number, field: AddressField, next: string) => {
 		onChange(
 			value.map((address, position) =>
 				position === index ? { ...address, [field]: next } : address,
+			),
+		);
+	};
+
+	const applyPickedAddress = (index: number, picked: PickedAddress) => {
+		onChange(
+			value.map((address, position) =>
+				position === index
+					? {
+							...address,
+							street: picked.street,
+							locality: picked.locality,
+							region: picked.region,
+							postalCode: picked.postalCode,
+							countryCode: picked.countryCode,
+						}
+					: address,
 			),
 		);
 	};
@@ -141,18 +165,32 @@ export function MeetingAddressesEditor({
 						<legend className="float-left text-sm font-medium">
 							Meeting address {index + 1}
 						</legend>
-						<Button
-							type="button"
-							variant="ghost"
-							size="sm"
-							className="text-muted-foreground"
-							disabled={value.length === 1}
-							onClick={() => removeAddress(index)}
-							aria-label={`Remove meeting address ${index + 1}`}
-						>
-							<CircleMinus aria-hidden="true" />
-							Remove
-						</Button>
+						<div className="flex items-center gap-2">
+							{apiKey && (
+								<Button
+									type="button"
+									variant="ghost"
+									size="sm"
+									className="text-muted-foreground"
+									onClick={() => setPickerIndex(index)}
+								>
+									<MapPin aria-hidden="true" />
+									Find on map
+								</Button>
+							)}
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								className="text-muted-foreground"
+								disabled={value.length === 1}
+								onClick={() => removeAddress(index)}
+								aria-label={`Remove meeting address ${index + 1}`}
+							>
+								<CircleMinus aria-hidden="true" />
+								Remove
+							</Button>
+						</div>
 					</div>
 					{fieldDefinitions.map((field) => (
 						<div
@@ -195,9 +233,23 @@ export function MeetingAddressesEditor({
 				</Button>
 				<p className="mt-2 text-xs text-muted-foreground">
 					Groups meet in at least one place. Add every address where this group
-					gathers.
+					gathers. If this group only meets virtually, add an address for the
+					city the group is based out of.
 				</p>
 			</div>
+			{apiKey && (
+				<MeetingAddressMapPicker
+					apiKey={apiKey}
+					open={pickerIndex !== null}
+					onOpenChange={(open) => {
+						if (!open) setPickerIndex(null);
+					}}
+					onConfirm={(picked) => {
+						if (pickerIndex !== null) applyPickedAddress(pickerIndex, picked);
+						setPickerIndex(null);
+					}}
+				/>
+			)}
 		</div>
 	);
 }

@@ -5,7 +5,16 @@ import { drizzle } from "drizzle-orm/d1";
 import { z } from "zod";
 import { workspaceAddresses, workspaceMembers, workspaces } from "#/db/schema";
 import { auth } from "#/lib/auth";
-import { meetingAddressInput } from "#/lib/workspace-addresses";
+import { geocodeMeetingAddress } from "#/lib/geocoding";
+import {
+	createCalendar,
+	isGoogleCalendarConfigured,
+	makeCalendarPublic,
+} from "#/lib/google-calendar";
+import {
+	type MeetingAddressInput,
+	meetingAddressInput,
+} from "#/lib/workspace-addresses";
 
 const workspaceInput = z.object({
 	name: z.string().trim().min(2).max(80),
@@ -15,12 +24,22 @@ const workspaceInput = z.object({
 		.min(2)
 		.max(60)
 		.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-	locality: z.string().trim().min(1).max(100),
-	region: z.string().trim().max(100).optional(),
-	countryCode: z.string().trim().length(2).toUpperCase(),
 	timezone: z.string().trim().min(1).max(100),
 	addresses: z.array(meetingAddressInput).min(1).max(10),
 });
+
+/**
+ * A group's home location comes from its default (first) meeting address, so
+ * the location is never asked for separately from the meeting locations.
+ */
+function primaryLocation(inputs: MeetingAddressInput[]) {
+	const [primary] = inputs;
+	return {
+		locality: primary.locality,
+		region: primary.region || null,
+		countryCode: primary.countryCode,
+	};
+}
 
 async function getSession(request: Request) {
 	return auth.api.getSession({ headers: request.headers });
@@ -34,6 +53,30 @@ function workspaceInputError(error: z.ZodError) {
 		return "Add at least one complete meeting address";
 	}
 	return "Check the group details and try again";
+}
+
+async function buildWorkspaceAddresses(
+	workspaceId: string,
+	inputs: MeetingAddressInput[],
+) {
+	return Promise.all(
+		inputs.map(async (address, index) => {
+			const coordinates = await geocodeMeetingAddress(address);
+			return {
+				id: crypto.randomUUID(),
+				workspaceId,
+				label: address.label || null,
+				street: address.street,
+				locality: address.locality,
+				region: address.region || null,
+				postalCode: address.postalCode || null,
+				countryCode: address.countryCode,
+				latitude: coordinates?.latitude ?? null,
+				longitude: coordinates?.longitude ?? null,
+				sortOrder: index,
+			};
+		}),
+	);
 }
 
 async function getMeetingAddresses(
@@ -184,22 +227,16 @@ const createWorkspace = async ({ request }: { request: Request }) => {
 	}
 
 	const workspaceId = crypto.randomUUID();
-	const addresses = result.data.addresses.map((address, index) => ({
-		id: crypto.randomUUID(),
+	const addresses = await buildWorkspaceAddresses(
 		workspaceId,
-		label: address.label || null,
-		street: address.street,
-		locality: address.locality,
-		region: address.region || null,
-		postalCode: address.postalCode || null,
-		countryCode: address.countryCode,
-		sortOrder: index,
-	}));
-	const { addresses: _inputAddresses, ...workspaceFields } = result.data;
+		result.data.addresses,
+	);
+	const { addresses: inputAddresses, ...workspaceFields } = result.data;
 	const workspace = {
 		id: workspaceId,
 		...workspaceFields,
-		region: result.data.region || null,
+		...primaryLocation(inputAddresses),
+		googleCalendarId: null as string | null,
 		status: "active",
 		createdByUserId: currentSession.user.id,
 	};
@@ -222,6 +259,27 @@ const createWorkspace = async ({ request }: { request: Request }) => {
 			);
 		}
 		throw error;
+	}
+
+	if (isGoogleCalendarConfigured()) {
+		try {
+			const calendarId = await createCalendar(
+				workspace.name,
+				workspace.timezone,
+			);
+			await makeCalendarPublic(calendarId);
+			await db
+				.update(workspaces)
+				.set({ googleCalendarId: calendarId, updatedAt: new Date() })
+				.where(eq(workspaces.id, workspaceId));
+			workspace.googleCalendarId = calendarId;
+		} catch (error) {
+			console.error(
+				"Could not create a Google calendar for this group",
+				workspaceId,
+				error,
+			);
+		}
 	}
 
 	return Response.json(
@@ -265,13 +323,14 @@ const updateWorkspace = async ({ request }: { request: Request }) => {
 	}
 
 	try {
+		const primary = primaryLocation(result.data.addresses);
 		const updateResult = await access.db.run(sql`
 			UPDATE workspace
 			SET name = ${result.data.name},
 				slug = ${result.data.slug},
-				locality = ${result.data.locality},
-				region = ${result.data.region || null},
-				country_code = ${result.data.countryCode},
+				locality = ${primary.locality},
+				region = ${primary.region},
+				country_code = ${primary.countryCode},
 				timezone = ${result.data.timezone},
 				updated_at = unixepoch()
 			WHERE id = ${access.workspace.id}
@@ -291,17 +350,10 @@ const updateWorkspace = async ({ request }: { request: Request }) => {
 			);
 		}
 
-		const addresses = result.data.addresses.map((address, index) => ({
-			id: crypto.randomUUID(),
-			workspaceId: access.workspace.id,
-			label: address.label || null,
-			street: address.street,
-			locality: address.locality,
-			region: address.region || null,
-			postalCode: address.postalCode || null,
-			countryCode: address.countryCode,
-			sortOrder: index,
-		}));
+		const addresses = await buildWorkspaceAddresses(
+			access.workspace.id,
+			result.data.addresses,
+		);
 		await access.db.batch([
 			access.db
 				.delete(workspaceAddresses)
@@ -321,8 +373,10 @@ const updateWorkspace = async ({ request }: { request: Request }) => {
 	return Response.json({
 		workspace: {
 			...access.workspace,
-			...result.data,
-			region: result.data.region || null,
+			name: result.data.name,
+			slug: result.data.slug,
+			timezone: result.data.timezone,
+			...primaryLocation(result.data.addresses),
 			addresses: await getMeetingAddresses(access.db, access.workspace.id),
 		},
 	});

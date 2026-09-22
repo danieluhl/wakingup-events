@@ -50,10 +50,35 @@ This project uses the Cloudflare Vite plugin (configured in `vite.config.ts`) an
 2. Authenticate: `wrangler login`
 3. Deploy: `pnpm exec wrangler deploy`
 
-For production env vars, run `wrangler secret put MY_VAR` for each secret listed in `.env.example`. Public (non-secret) vars go in `wrangler.jsonc` under `vars`.
-
 KV, D1, R2, and Durable Object bindings are configured in `wrangler.jsonc` — see https://developers.cloudflare.com/workers/wrangler/configuration/.
 
+## Environment Variables
+
+Local development secrets belong in `.env.local` (git-ignored). Wrangler loads both `.env` and `.env.local` for local development, with `.env.local` taking precedence. The `.env` file is a local reference only — production does **not** read either file.
+
+Production secrets are stored in Cloudflare and must be set with Wrangler:
+
+```bash
+wrangler secret put BETTER_AUTH_SECRET
+wrangler secret put GOOGLE_CLIENT_ID
+wrangler secret put GOOGLE_CLIENT_SECRET
+wrangler secret put GOOGLE_MAPS_API_KEY
+```
+
+Public (non-secret) vars can go in `wrangler.jsonc` under `vars`.
+
+| Variable | Scope | Purpose |
+| --- | --- | --- |
+| `BETTER_AUTH_URL` | server | Public URL of the app, used by Better Auth |
+| `BETTER_AUTH_SECRET` | secret | Signing secret for Better Auth |
+| `BETTER_AUTH_API_KEY` | secret | Optional Better Auth infrastructure key |
+| `GOOGLE_CLIENT_ID` | secret | Google OAuth sign-in |
+| `GOOGLE_CLIENT_SECRET` | secret | Google OAuth sign-in |
+| `GOOGLE_MAPS_API_KEY` | secret | Server-side geocoding for nearby group search. Must **not** use HTTP referrer restrictions (Google rejects those for web service APIs). Restrict by API instead (allow only the Geocoding API); IP restrictions are unreliable because Workers egress IPs are not static |
+| `VITE_GOOGLE_MAPS_API_KEY` | public | Browser Google Maps JavaScript key; must be set at build time |
+| `DATABASE_URL` | local only | Local SQLite database for Drizzle commands |
+
+Variables are typed and validated in `src/env.ts` with T3Env; add new entries there as well.
 
 ## Shadcn
 

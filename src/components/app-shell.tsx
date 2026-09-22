@@ -6,6 +6,7 @@ import {
 	ChevronsUpDown,
 	House,
 	LogOut,
+	Search,
 	Users,
 } from "lucide-react";
 import { useEffect, useRef } from "react";
@@ -40,6 +41,7 @@ import { canManageEvents } from "#/lib/workspace-roles";
 const navigation = [
 	{ label: "Home", to: "/home", icon: House },
 	{ label: "Groups", to: "/groups", icon: Users },
+	{ label: "Find a group", to: "/groups/search", icon: Search },
 ] as const;
 
 function getInitials(name: string) {
@@ -56,7 +58,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	});
-	const { data: session } = authClient.useSession();
+	const { data: session, isPending: isSessionPending } =
+		authClient.useSession();
 	const {
 		selectedGroup,
 		isPending: areGroupsPending,
@@ -64,6 +67,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 	} = useGroup();
 	const defaultSelectionAppliedForUser = useRef<string | null>(null);
 	const isPublicPage = pathname === "/" || pathname === "/login";
+	const isRedirectingToRoot =
+		!isSessionPending && !session?.user && !isPublicPage;
+
+	useEffect(() => {
+		if (isRedirectingToRoot) {
+			void navigate({ to: "/", replace: true });
+		}
+	}, [isRedirectingToRoot, navigate]);
 
 	useEffect(() => {
 		const userId = session?.user.id;
@@ -74,13 +85,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 		if (
 			areGroupsPending ||
 			!selectedGroup ||
+			pathname !== "/home" ||
 			defaultSelectionAppliedForUser.current === userId
 		) {
 			return;
 		}
 
 		defaultSelectionAppliedForUser.current = userId;
-		if (pathname === "/home" && hasRestorableSelection) {
+		if (hasRestorableSelection) {
 			void navigate({
 				to: "/groups/$slug",
 				params: { slug: selectedGroup.slug },
@@ -95,6 +107,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 		selectedGroup,
 		session?.user.id,
 	]);
+
+	if (isRedirectingToRoot) {
+		return null;
+	}
 
 	return (
 		<SidebarProvider>
@@ -324,7 +340,7 @@ function NavigationLinks({
 	const isGroupsActive =
 		pathname === "/groups" ||
 		pathname === "/groups/new" ||
-		/^\/groups\/[^/]+$/.test(pathname);
+		(/^\/groups\/[^/]+$/.test(pathname) && pathname !== "/groups/search");
 	const isEventsActive =
 		selectedGroup !== null &&
 		(pathname === `/groups/${selectedGroup.slug}/events` ||

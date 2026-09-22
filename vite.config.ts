@@ -8,7 +8,14 @@ import { defineConfig } from "vite";
 const config = defineConfig({
 	resolve: { tsconfigPaths: true },
 	plugins: [
-		devtools(),
+		devtools({
+			injectSource: {
+				enabled: true,
+				ignore: {
+					components: ["Pin", "InfoWindow", "Map", "GoogleMap"],
+				},
+			},
+		}),
 		cloudflare({ viteEnvironment: { name: "ssr" } }),
 		tailwindcss(),
 		tanstackStart(),

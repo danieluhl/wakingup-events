@@ -19,7 +19,10 @@ import { Route as ApiWorkspacesRouteImport } from './routes/api/workspaces'
 import { Route as GroupsIndexRouteImport } from './routes/groups/index'
 import { Route as GroupsSlugRouteImport } from './routes/groups/$slug'
 import { Route as GroupsNewRouteImport } from './routes/groups/new'
+import { Route as GroupsSearchRouteImport } from './routes/groups/search'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiGroupsSearchRouteImport } from './routes/api/groups/search'
+import { Route as ApiWorkspacesCalendarRouteImport } from './routes/api/workspaces/calendar'
 import { Route as ApiWorkspacesMembersRouteImport } from './routes/api/workspaces/members'
 import { Route as GroupsSlugEventsRouteImport } from './routes/groups/$slug_.events'
 import { Route as GroupsSlugRolesRouteImport } from './routes/groups/$slug_.roles'
@@ -75,10 +78,25 @@ const GroupsNewRoute = GroupsNewRouteImport.update({
   path: '/groups/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GroupsSearchRoute = GroupsSearchRouteImport.update({
+  id: '/groups/search',
+  path: '/groups/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ApiGroupsSearchRoute = ApiGroupsSearchRouteImport.update({
+  id: '/api/groups/search',
+  path: '/api/groups/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWorkspacesCalendarRoute = ApiWorkspacesCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => ApiWorkspacesRoute,
 } as any)
 const ApiWorkspacesMembersRoute = ApiWorkspacesMembersRouteImport.update({
   id: '/members',
@@ -111,8 +129,11 @@ export interface FileRoutesByFullPath {
   '/api/workspaces': typeof ApiWorkspacesRouteWithChildren
   '/groups/$slug': typeof GroupsSlugRoute
   '/groups/new': typeof GroupsNewRoute
+  '/groups/search': typeof GroupsSearchRoute
   '/groups/': typeof GroupsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/groups/search': typeof ApiGroupsSearchRoute
+  '/api/workspaces/calendar': typeof ApiWorkspacesCalendarRoute
   '/api/workspaces/members': typeof ApiWorkspacesMembersRoute
   '/groups/$slug/events': typeof GroupsSlugEventsRoute
   '/groups/$slug/roles': typeof GroupsSlugRolesRoute
@@ -128,8 +149,11 @@ export interface FileRoutesByTo {
   '/api/workspaces': typeof ApiWorkspacesRouteWithChildren
   '/groups/$slug': typeof GroupsSlugRoute
   '/groups/new': typeof GroupsNewRoute
+  '/groups/search': typeof GroupsSearchRoute
   '/groups': typeof GroupsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/groups/search': typeof ApiGroupsSearchRoute
+  '/api/workspaces/calendar': typeof ApiWorkspacesCalendarRoute
   '/api/workspaces/members': typeof ApiWorkspacesMembersRoute
   '/groups/$slug/events': typeof GroupsSlugEventsRoute
   '/groups/$slug/roles': typeof GroupsSlugRolesRoute
@@ -146,8 +170,11 @@ export interface FileRoutesById {
   '/api/workspaces': typeof ApiWorkspacesRouteWithChildren
   '/groups/$slug': typeof GroupsSlugRoute
   '/groups/new': typeof GroupsNewRoute
+  '/groups/search': typeof GroupsSearchRoute
   '/groups/': typeof GroupsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/groups/search': typeof ApiGroupsSearchRoute
+  '/api/workspaces/calendar': typeof ApiWorkspacesCalendarRoute
   '/api/workspaces/members': typeof ApiWorkspacesMembersRoute
   '/groups/$slug_/events': typeof GroupsSlugEventsRoute
   '/groups/$slug_/roles': typeof GroupsSlugRolesRoute
@@ -165,8 +192,11 @@ export interface FileRouteTypes {
     | '/api/workspaces'
     | '/groups/$slug'
     | '/groups/new'
+    | '/groups/search'
     | '/groups/'
     | '/api/auth/$'
+    | '/api/groups/search'
+    | '/api/workspaces/calendar'
     | '/api/workspaces/members'
     | '/groups/$slug/events'
     | '/groups/$slug/roles'
@@ -182,8 +212,11 @@ export interface FileRouteTypes {
     | '/api/workspaces'
     | '/groups/$slug'
     | '/groups/new'
+    | '/groups/search'
     | '/groups'
     | '/api/auth/$'
+    | '/api/groups/search'
+    | '/api/workspaces/calendar'
     | '/api/workspaces/members'
     | '/groups/$slug/events'
     | '/groups/$slug/roles'
@@ -199,8 +232,11 @@ export interface FileRouteTypes {
     | '/api/workspaces'
     | '/groups/$slug'
     | '/groups/new'
+    | '/groups/search'
     | '/groups/'
     | '/api/auth/$'
+    | '/api/groups/search'
+    | '/api/workspaces/calendar'
     | '/api/workspaces/members'
     | '/groups/$slug_/events'
     | '/groups/$slug_/roles'
@@ -217,8 +253,10 @@ export interface RootRouteChildren {
   ApiWorkspacesRoute: typeof ApiWorkspacesRouteWithChildren
   GroupsSlugRoute: typeof GroupsSlugRoute
   GroupsNewRoute: typeof GroupsNewRoute
+  GroupsSearchRoute: typeof GroupsSearchRoute
   GroupsIndexRoute: typeof GroupsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiGroupsSearchRoute: typeof ApiGroupsSearchRoute
   GroupsSlugEventsRoute: typeof GroupsSlugEventsRoute
   GroupsSlugRolesRoute: typeof GroupsSlugRolesRoute
   GroupsSlugEventsNewRoute: typeof GroupsSlugEventsNewRoute
@@ -296,12 +334,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GroupsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/groups/search': {
+      id: '/groups/search'
+      path: '/groups/search'
+      fullPath: '/groups/search'
+      preLoaderRoute: typeof GroupsSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/groups/search': {
+      id: '/api/groups/search'
+      path: '/api/groups/search'
+      fullPath: '/api/groups/search'
+      preLoaderRoute: typeof ApiGroupsSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/workspaces/calendar': {
+      id: '/api/workspaces/calendar'
+      path: '/calendar'
+      fullPath: '/api/workspaces/calendar'
+      preLoaderRoute: typeof ApiWorkspacesCalendarRouteImport
+      parentRoute: typeof ApiWorkspacesRoute
     }
     '/api/workspaces/members': {
       id: '/api/workspaces/members'
@@ -335,10 +394,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface ApiWorkspacesRouteChildren {
+  ApiWorkspacesCalendarRoute: typeof ApiWorkspacesCalendarRoute
   ApiWorkspacesMembersRoute: typeof ApiWorkspacesMembersRoute
 }
 
 const ApiWorkspacesRouteChildren: ApiWorkspacesRouteChildren = {
+  ApiWorkspacesCalendarRoute: ApiWorkspacesCalendarRoute,
   ApiWorkspacesMembersRoute: ApiWorkspacesMembersRoute,
 }
 
@@ -356,8 +417,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiWorkspacesRoute: ApiWorkspacesRouteWithChildren,
   GroupsSlugRoute: GroupsSlugRoute,
   GroupsNewRoute: GroupsNewRoute,
+  GroupsSearchRoute: GroupsSearchRoute,
   GroupsIndexRoute: GroupsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiGroupsSearchRoute: ApiGroupsSearchRoute,
   GroupsSlugEventsRoute: GroupsSlugEventsRoute,
   GroupsSlugRolesRoute: GroupsSlugRolesRoute,
   GroupsSlugEventsNewRoute: GroupsSlugEventsNewRoute,

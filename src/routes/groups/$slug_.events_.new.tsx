@@ -69,7 +69,8 @@ function NewEvent() {
 
 	const [title, setTitle] = useState("");
 	const [startsAt, setStartsAt] = useState("");
-	const [durationMinutes, setDurationMinutes] = useState("60");
+	const [durationHours, setDurationHours] = useState("1");
+	const [durationMinutes, setDurationMinutes] = useState("0");
 	const [locationChoice, setLocationChoice] = useState("");
 	const [customLocation, setCustomLocation] = useState("");
 	const [organizerUserId, setOrganizerUserId] = useState("");
@@ -164,6 +165,17 @@ function NewEvent() {
 			return;
 		}
 
+		const totalDurationMinutes =
+			Number(durationHours) * 60 + Number(durationMinutes);
+		if (
+			!Number.isFinite(totalDurationMinutes) ||
+			totalDurationMinutes < 5 ||
+			totalDurationMinutes > 1440
+		) {
+			setError("Enter a duration between 5 minutes and 24 hours");
+			return;
+		}
+
 		const selectedAddress = workspace.addresses.find(
 			(address) => address.id === locationChoice,
 		);
@@ -187,7 +199,7 @@ function NewEvent() {
 					body: JSON.stringify({
 						title,
 						startsAt: startsAtUtc.toISOString(),
-						durationMinutes: Number(durationMinutes),
+						durationMinutes: totalDurationMinutes,
 						location,
 						organizerUserId,
 					}),
@@ -326,17 +338,41 @@ function NewEvent() {
 									</p>
 								</div>
 								<div className="grid gap-2">
-									<Label htmlFor="event-duration">Duration in minutes</Label>
-									<Input
-										id="event-duration"
-										type="number"
-										value={durationMinutes}
-										onChange={(event) => setDurationMinutes(event.target.value)}
-										min={5}
-										max={1440}
-										step={5}
-										required
-									/>
+									<Label htmlFor="event-duration-hours">Duration</Label>
+									<div className="grid grid-cols-2 gap-3">
+										<div className="grid gap-2">
+											<Input
+												id="event-duration-hours"
+												type="number"
+												inputMode="numeric"
+												value={durationHours}
+												onChange={(event) =>
+													setDurationHours(event.target.value)
+												}
+												min={0}
+												max={24}
+												required
+												aria-label="Hours"
+											/>
+											<p className="text-xs text-muted-foreground">Hours</p>
+										</div>
+										<div className="grid gap-2">
+											<Input
+												id="event-duration-minutes"
+												type="number"
+												inputMode="numeric"
+												value={durationMinutes}
+												onChange={(event) =>
+													setDurationMinutes(event.target.value)
+												}
+												min={0}
+												max={59}
+												required
+												aria-label="Minutes"
+											/>
+											<p className="text-xs text-muted-foreground">Minutes</p>
+										</div>
+									</div>
 								</div>
 							</div>
 							<div className="grid gap-2">

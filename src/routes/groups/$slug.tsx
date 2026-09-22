@@ -7,11 +7,12 @@ import {
 	Trash2,
 } from "lucide-react";
 import { type FormEvent, useEffect, useState } from "react";
+import { z } from "zod";
 import {
 	type MeetingAddressDraft,
-	MeetingAddressesEditor,
 	meetingAddressesToDrafts,
 } from "#/components/meeting-addresses-editor";
+import { MeetingAddressesManager } from "#/components/meeting-addresses-manager";
 import { Alert, AlertDescription } from "#/components/ui/alert";
 import { Badge } from "#/components/ui/badge";
 import { Button, buttonVariants } from "#/components/ui/button";
@@ -29,6 +30,7 @@ import { Skeleton } from "#/components/ui/skeleton";
 import { authClient } from "#/lib/auth-client";
 import {
 	formatMeetingAddress,
+	meetingAddressInput,
 	type StoredMeetingAddress,
 } from "#/lib/workspace-addresses";
 
@@ -45,6 +47,8 @@ interface WorkspaceDetails {
 	role: string;
 	addresses: StoredMeetingAddress[];
 }
+
+const meetingAddressesInput = z.array(meetingAddressInput).min(1).max(10);
 
 export const Route = createFileRoute("/groups/$slug")({
 	component: Workspace,
@@ -213,9 +217,6 @@ function WorkspaceSettings({
 }) {
 	const [name, setName] = useState(workspace.name);
 	const [slug, setSlug] = useState(workspace.slug);
-	const [locality, setLocality] = useState(workspace.locality);
-	const [region, setRegion] = useState(workspace.region ?? "");
-	const [countryCode, setCountryCode] = useState(workspace.countryCode);
 	const [timezone, setTimezone] = useState(workspace.timezone);
 	const [addresses, setAddresses] = useState<MeetingAddressDraft[]>(() =>
 		meetingAddressesToDrafts(workspace.addresses),
@@ -230,6 +231,12 @@ function WorkspaceSettings({
 		event.preventDefault();
 		setError(null);
 		setMessage(null);
+
+		if (!meetingAddressesInput.safeParse(addresses).success) {
+			setError("Add at least one complete meeting address");
+			return;
+		}
+
 		setIsSaving(true);
 
 		try {
@@ -241,9 +248,6 @@ function WorkspaceSettings({
 					body: JSON.stringify({
 						name,
 						slug,
-						locality,
-						region,
-						countryCode,
 						timezone,
 						addresses,
 					}),
@@ -359,63 +363,25 @@ function WorkspaceSettings({
 							/groups/{slug || "your-location"}
 						</p>
 					</div>
-					<div className="grid gap-5 sm:grid-cols-2">
-						<div className="grid gap-2">
-							<Label htmlFor="settings-locality">City or locality</Label>
-							<Input
-								id="settings-locality"
-								value={locality}
-								onChange={(event) => setLocality(event.target.value)}
-								maxLength={100}
-								required
-							/>
-						</div>
-						<div className="grid gap-2">
-							<Label htmlFor="settings-region">
-								State, province, or region
-							</Label>
-							<Input
-								id="settings-region"
-								value={region}
-								onChange={(event) => setRegion(event.target.value)}
-								maxLength={100}
-							/>
-						</div>
-					</div>
-					<div className="grid gap-5 sm:grid-cols-[1fr_2fr]">
-						<div className="grid gap-2">
-							<Label htmlFor="settings-country-code">Country code</Label>
-							<Input
-								id="settings-country-code"
-								value={countryCode}
-								onChange={(event) =>
-									setCountryCode(event.target.value.toUpperCase())
-								}
-								minLength={2}
-								maxLength={2}
-								required
-							/>
-						</div>
-						<div className="grid gap-2">
-							<Label htmlFor="settings-timezone">Timezone</Label>
-							<Input
-								id="settings-timezone"
-								value={timezone}
-								onChange={(event) => setTimezone(event.target.value)}
-								maxLength={100}
-								required
-							/>
-						</div>
+					<div className="grid gap-2">
+						<Label htmlFor="settings-timezone">Timezone</Label>
+						<Input
+							id="settings-timezone"
+							value={timezone}
+							onChange={(event) => setTimezone(event.target.value)}
+							maxLength={100}
+							required
+						/>
 					</div>
 					<div className="grid gap-3 pt-2">
 						<div>
-							<h3 className="font-medium">Meeting addresses</h3>
+							<h3 className="font-medium">Meeting locations</h3>
 							<p className="mt-1 text-sm text-muted-foreground">
-								Keep every place this group gathers up to date. At least one
-								address is required.
+								The first location becomes this group's default meeting
+								location. Keep every other place this group gathers up to date.
 							</p>
 						</div>
-						<MeetingAddressesEditor
+						<MeetingAddressesManager
 							value={addresses}
 							onChange={setAddresses}
 							idPrefix="settings"

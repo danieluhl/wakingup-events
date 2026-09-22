@@ -58,16 +58,12 @@ function NewWorkspace() {
 		setError(null);
 		setIsSubmitting(true);
 
-		const formData = new FormData(event.currentTarget);
 		const response = await fetch("/api/workspaces", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
 				name,
 				slug,
-				locality: String(formData.get("locality")),
-				region: String(formData.get("region")),
-				countryCode: String(formData.get("countryCode")),
 				timezone,
 				addresses,
 			}),
@@ -174,53 +170,22 @@ function NewWorkspace() {
 									/groups/{slug || "your-location"}
 								</p>
 							</div>
-							<div className="grid gap-5 sm:grid-cols-2">
-								<div className="grid gap-2">
-									<Label htmlFor="locality">City or locality</Label>
-									<Input
-										id="locality"
-										name="locality"
-										placeholder="Boston"
-										required
-									/>
-								</div>
-								<div className="grid gap-2">
-									<Label htmlFor="region">State, province, or region</Label>
-									<Input
-										id="region"
-										name="region"
-										placeholder="Massachusetts"
-									/>
-								</div>
-							</div>
-							<div className="grid gap-5 sm:grid-cols-[1fr_2fr]">
-								<div className="grid gap-2">
-									<Label htmlFor="countryCode">Country code</Label>
-									<Input
-										id="countryCode"
-										name="countryCode"
-										placeholder="US"
-										minLength={2}
-										maxLength={2}
-										required
-									/>
-								</div>
-								<div className="grid gap-2">
-									<Label htmlFor="timezone">Timezone</Label>
-									<Input
-										id="timezone"
-										value={timezone}
-										onChange={(event) => setTimezone(event.target.value)}
-										placeholder="America/New_York"
-										required
-									/>
-								</div>
+							<div className="grid gap-2">
+								<Label htmlFor="timezone">Timezone</Label>
+								<Input
+									id="timezone"
+									value={timezone}
+									onChange={(event) => setTimezone(event.target.value)}
+									placeholder="America/New_York"
+									required
+								/>
 							</div>
 							<div className="grid gap-3 pt-2">
 								<div>
-									<h2 className="font-medium">Meeting addresses</h2>
+									<h2 className="font-medium">Meeting locations</h2>
 									<p className="mt-1 text-sm text-muted-foreground">
-										Where does this group gather? Add at least one address.
+										The first location becomes this group's default meeting
+										location. Add every other place the group gathers.
 									</p>
 								</div>
 								<MeetingAddressesEditor
