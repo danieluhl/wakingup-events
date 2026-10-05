@@ -119,6 +119,7 @@ const searchGroups = async ({ request }: { request: Request }) => {
 		}),
 	);
 
+	const seenLocations = new Set<string>();
 	const locations = addressRows
 		.flatMap((row) => {
 			if (
@@ -157,7 +158,15 @@ const searchGroups = async ({ request }: { request: Request }) => {
 				},
 			];
 		})
-		.sort((a, b) => a.distanceMiles - b.distanceMiles);
+		.sort((a, b) => a.distanceMiles - b.distanceMiles)
+		.filter((location) => {
+			const key = `${location.name.trim().toLowerCase()}|${location.address
+				.trim()
+				.toLowerCase()}`;
+			if (seenLocations.has(key)) return false;
+			seenLocations.add(key);
+			return true;
+		});
 
 	return Response.json({ origin, locations });
 };

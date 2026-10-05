@@ -1,5 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Building2, Plus, Settings, ShieldCheck } from "lucide-react";
+import {
+	Building2,
+	CalendarDays,
+	Clock,
+	MapPin,
+	Plus,
+	Settings,
+	ShieldCheck,
+} from "lucide-react";
 import { useGroup } from "#/components/group-context";
 import { Alert, AlertDescription } from "#/components/ui/alert";
 import { Badge } from "#/components/ui/badge";
@@ -13,6 +21,7 @@ import {
 } from "#/components/ui/card";
 import { Skeleton } from "#/components/ui/skeleton";
 import { authClient } from "#/lib/auth-client";
+import { formatMeetingAddress } from "#/lib/workspace-addresses";
 
 export const Route = createFileRoute("/groups/")({ component: Groups });
 
@@ -25,7 +34,7 @@ function Groups() {
 		return (
 			<main className="page-wrap min-h-[calc(100dvh-4rem)] py-10 sm:py-16">
 				<div className="mx-auto max-w-5xl space-y-5">
-					<Skeleton className="h-10 w-48 rounded-none" />
+					<Skeleton className="h-10 w-48 rounded-full" />
 					<Skeleton className="h-48 w-full rounded-2xl" />
 				</div>
 			</main>
@@ -85,49 +94,139 @@ function Groups() {
 							Your group memberships
 						</h2>
 						<div className="grid gap-5 md:grid-cols-2">
-							{groups.map((group) => (
-								<Card key={group.id} className="island-shell rounded-2xl">
-									<CardHeader>
-										<div className="flex items-start justify-between gap-4">
-											<div className="min-w-0">
-												<CardTitle
-													role="heading"
-													aria-level={2}
-													className="display-title truncate text-2xl"
+							{groups.map((group) => {
+								const location = [
+									group.locality,
+									group.region,
+									group.countryCode,
+								]
+									.filter(Boolean)
+									.join(", ");
+								const createdAt = new Date(group.createdAt).toLocaleDateString(
+									undefined,
+									{
+										year: "numeric",
+										month: "long",
+										day: "numeric",
+									},
+								);
+
+								return (
+									<Card key={group.id} className="island-shell rounded-2xl">
+										<CardHeader>
+											<div className="flex items-start justify-between gap-4">
+												<div className="min-w-0">
+													<CardTitle
+														role="heading"
+														aria-level={2}
+														className="display-title truncate text-2xl"
+													>
+														{group.name}
+													</CardTitle>
+													<CardDescription className="mt-1 truncate">
+														/groups/{group.slug}
+													</CardDescription>
+												</div>
+												<Badge
+													variant="outline"
+													className="shrink-0 capitalize"
 												>
-													{group.name}
-												</CardTitle>
-												<CardDescription className="mt-1 truncate">
-													/groups/{group.slug}
-												</CardDescription>
+													<ShieldCheck
+														className="size-3.5"
+														aria-hidden="true"
+													/>
+													{group.role}
+												</Badge>
 											</div>
-											<Badge variant="outline" className="shrink-0 capitalize">
-												<ShieldCheck className="size-3.5" aria-hidden="true" />
-												{group.role}
-											</Badge>
-										</div>
-									</CardHeader>
-									<CardContent className="flex items-center justify-between gap-4">
-										<Badge className="capitalize">{group.status}</Badge>
-										<Link
-											to="/groups/$slug"
-											params={{ slug: group.slug }}
-											hash={
-												group.role === "owner" ? "group-settings" : undefined
-											}
-											className={buttonVariants({
-												variant: group.role === "owner" ? "default" : "outline",
-												size: "sm",
-											})}
-										>
-											{group.role === "owner" && (
-												<Settings aria-hidden="true" />
-											)}
-											{group.role === "owner" ? "Manage group" : "View group"}
-										</Link>
-									</CardContent>
-								</Card>
-							))}
+										</CardHeader>
+										<CardContent className="grid gap-5">
+											<dl className="grid gap-3 text-sm">
+												<div className="flex items-start gap-2">
+													<MapPin
+														className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+														aria-hidden="true"
+													/>
+													<div>
+														<dt className="island-kicker">Location</dt>
+														<dd className="mt-1 font-medium">{location}</dd>
+													</div>
+												</div>
+												<div className="flex items-start gap-2">
+													<Clock
+														className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+														aria-hidden="true"
+													/>
+													<div>
+														<dt className="island-kicker">Timezone</dt>
+														<dd className="mt-1 font-medium">
+															{group.timezone}
+														</dd>
+													</div>
+												</div>
+												<div className="flex items-start gap-2">
+													<CalendarDays
+														className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+														aria-hidden="true"
+													/>
+													<div>
+														<dt className="island-kicker">Created</dt>
+														<dd className="mt-1 font-medium">{createdAt}</dd>
+													</div>
+												</div>
+												<div className="flex items-start gap-2">
+													<MapPin
+														className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+														aria-hidden="true"
+													/>
+													<div className="min-w-0">
+														<dt className="island-kicker">Meeting locations</dt>
+														<dd className="mt-1">
+															<ul className="grid gap-1">
+																{group.addresses.map((address) => (
+																	<li key={address.id}>
+																		{address.label && (
+																			<span className="font-medium">
+																				{address.label}:{" "}
+																			</span>
+																		)}
+																		<span className="text-muted-foreground">
+																			{formatMeetingAddress(address)}
+																		</span>
+																	</li>
+																))}
+															</ul>
+														</dd>
+													</div>
+												</div>
+											</dl>
+											<div className="flex items-center justify-between gap-4">
+												<Badge className="capitalize">{group.status}</Badge>
+												<Link
+													to="/groups/$slug"
+													params={{ slug: group.slug }}
+													hash={
+														group.role === "owner"
+															? "group-settings"
+															: undefined
+													}
+													className={buttonVariants({
+														variant:
+															group.role === "owner" ? "default" : "outline",
+														size: "sm",
+													})}
+												>
+													{group.role === "owner" && (
+														<Settings aria-hidden="true" />
+													)}
+													{group.role === "owner"
+														? "Manage group"
+														: "View group"}
+												</Link>
+											</div>
+										</CardContent>
+									</Card>
+								);
+							})}
 						</div>
 					</section>
 				)}

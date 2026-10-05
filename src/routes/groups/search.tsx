@@ -202,33 +202,31 @@ function SearchGroups() {
 					</Alert>
 				)}
 
-				{status === "loading" && (
-					<Skeleton className="h-120 w-full rounded-2xl" />
-				)}
+				<Card className="island-shell overflow-hidden rounded-2xl p-0">
+					<CardContent className="p-0">
+						{apiKey ? (
+							<APIProvider apiKey={apiKey}>
+								<GroupMap
+									origin={origin}
+									locations={locations}
+									selectedLocationId={selectedLocationId}
+									onSelectLocation={setSelectedLocationId}
+								/>
+							</APIProvider>
+						) : (
+							<div className="grid gap-2 px-6 py-16 text-center">
+								<p className="font-medium">Map unavailable</p>
+								<p className="text-sm text-muted-foreground">
+									Set VITE_GOOGLE_MAPS_API_KEY to display the map. Nearby groups
+									are still listed below.
+								</p>
+							</div>
+						)}
+					</CardContent>
+				</Card>
 
-				{status !== "loading" && (
-					<Card className="island-shell overflow-hidden rounded-2xl p-0">
-						<CardContent className="p-0">
-							{apiKey ? (
-								<APIProvider apiKey={apiKey}>
-									<GroupMap
-										origin={origin}
-										locations={locations}
-										selectedLocationId={selectedLocationId}
-										onSelectLocation={setSelectedLocationId}
-									/>
-								</APIProvider>
-							) : (
-								<div className="grid gap-2 px-6 py-16 text-center">
-									<p className="font-medium">Map unavailable</p>
-									<p className="text-sm text-muted-foreground">
-										Set VITE_GOOGLE_MAPS_API_KEY to display the map. Nearby
-										groups are still listed below.
-									</p>
-								</div>
-							)}
-						</CardContent>
-					</Card>
+				{status === "loading" && (
+					<Skeleton className="h-40 w-full rounded-2xl" />
 				)}
 
 				{status === "ready" && (
@@ -352,7 +350,7 @@ function GroupMap({
 				>
 					<Pin
 						background={
-							location.id === selectedLocationId ? "#1d4ed8" : "#0f766e"
+							location.id === selectedLocationId ? "#b0702a" : "#5b3e8c"
 						}
 						borderColor="#ffffff"
 						glyphColor="#ffffff"
@@ -367,13 +365,13 @@ function GroupMap({
 					}}
 					onCloseClick={() => onSelectLocation(null)}
 				>
-					<div className="grid gap-1 text-[#29231e]">
+					<div className="grid gap-1 text-[#231b26]">
 						<p className="font-semibold">{selectedLocation.name}</p>
-						<p className="text-sm text-[#6b6055]">{selectedLocation.address}</p>
+						<p className="text-sm text-[#6d6172]">{selectedLocation.address}</p>
 						<Link
 							to="/groups/$slug"
 							params={{ slug: selectedLocation.slug }}
-							className="text-sm font-semibold text-[#416762] underline underline-offset-2"
+							className="text-sm font-semibold text-[#5b3e8c] underline underline-offset-2"
 						>
 							View group
 						</Link>

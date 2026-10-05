@@ -2,23 +2,30 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 import { cn } from "#/lib/utils";
 
+// Stillpoint Bloom buttons: quiet pills. `btn` carries a hidden oil-slick ring
+// (see styles.css) that shows on keyboard focus; `btn-iris` also reveals it on
+// hover for the primary and outline variants.
 const buttonVariants = cva(
-	"button-block inline-flex shrink-0 items-center justify-center gap-2 border-2 border-[#241c17] font-extrabold uppercase tracking-[0.08em] text-black no-underline select-none hover:text-black focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#9a825f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#211a16] disabled:pointer-events-none disabled:opacity-50 dark:border-[#fffaf2] dark:text-[#fffaf2] dark:hover:text-white [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+	"btn inline-flex shrink-0 items-center justify-center gap-2 rounded-full border border-transparent font-medium whitespace-nowrap no-underline select-none outline-none transition-[background-color,border-color,color,transform] focus-visible:outline-none disabled:pointer-events-none disabled:opacity-45 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
 	{
 		variants: {
 			variant: {
-				default: "bg-[#6f918b] hover:bg-[#82a19b]",
-				secondary: "bg-[#a98262] hover:bg-[#b89474]",
-				outline: "bg-[#c3b49b] hover:bg-[#d0c3ad]",
+				default:
+					"btn-iris bg-primary text-primary-foreground hover:bg-(--primary-hover) hover:text-primary-foreground",
+				secondary:
+					"bg-secondary text-secondary-foreground hover:bg-(--secondary-hover) hover:text-secondary-foreground",
+				outline:
+					"btn-iris border-input bg-transparent text-foreground hover:bg-secondary hover:text-foreground",
 				ghost:
-					"button-flat border-transparent bg-transparent text-[#4b4037] hover:border-[#8f806f] hover:bg-[#ded4c5] hover:text-[#241c17] dark:text-[#cbbda9] dark:hover:border-[#786652] dark:hover:bg-[#40342b] dark:hover:text-[#f0e6d8]",
-				destructive: "bg-[#b66a55] hover:bg-[#c27b66]",
+					"bg-transparent text-muted-foreground hover:bg-secondary hover:text-foreground",
+				destructive:
+					"border-destructive/50 bg-transparent text-destructive hover:bg-destructive/10 hover:text-destructive",
 			},
 			size: {
-				default: "h-11 px-5 text-sm",
-				sm: "h-9 px-4 text-xs",
-				lg: "h-13 px-7 text-base",
-				icon: "size-11",
+				default: "h-10 px-5 text-sm",
+				sm: "h-8 px-3.5 text-[0.8125rem]",
+				lg: "h-12 px-7 text-[0.9375rem]",
+				icon: "size-10",
 			},
 		},
 		defaultVariants: {

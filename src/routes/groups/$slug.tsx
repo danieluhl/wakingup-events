@@ -13,6 +13,7 @@ import {
 	meetingAddressesToDrafts,
 } from "#/components/meeting-addresses-editor";
 import { MeetingAddressesManager } from "#/components/meeting-addresses-manager";
+import { MeetingTypesManager } from "#/components/meeting-types-manager";
 import { Alert, AlertDescription } from "#/components/ui/alert";
 import { Badge } from "#/components/ui/badge";
 import { Button, buttonVariants } from "#/components/ui/button";
@@ -28,6 +29,7 @@ import { Label } from "#/components/ui/label";
 import { Separator } from "#/components/ui/separator";
 import { Skeleton } from "#/components/ui/skeleton";
 import { authClient } from "#/lib/auth-client";
+import type { MeetingTypeRecord } from "#/lib/meeting-types";
 import {
 	formatMeetingAddress,
 	meetingAddressInput,
@@ -46,6 +48,7 @@ interface WorkspaceDetails {
 	createdAt: string;
 	role: string;
 	addresses: StoredMeetingAddress[];
+	meetingTypes: MeetingTypeRecord[];
 }
 
 const meetingAddressesInput = z.array(meetingAddressInput).min(1).max(10);
@@ -192,6 +195,28 @@ function Workspace() {
 							Your role in this group is {workspace.role}. Event and community
 							tools can be added here as the local group takes shape.
 						</p>
+					</CardContent>
+				</Card>
+				<Card className="island-shell mt-8 rounded-2xl p-0">
+					<CardHeader className="border-b px-6 py-7 sm:px-10">
+						<CardTitle role="heading" aria-level={2}>
+							Meeting types
+						</CardTitle>
+						<CardDescription>
+							The kinds of gatherings {workspace.name} offers, with notes on how
+							each one is held. Organizers see these when they add an event.
+						</CardDescription>
+					</CardHeader>
+					<CardContent className="px-6 py-8 sm:px-10">
+						<MeetingTypesManager
+							slug={workspace.slug}
+							value={workspace.meetingTypes}
+							onChange={(meetingTypes) =>
+								setWorkspace({ ...workspace, meetingTypes })
+							}
+							canEdit={workspace.role === "owner"}
+							idPrefix="group"
+						/>
 					</CardContent>
 				</Card>
 				{workspace.role === "owner" && (

@@ -9,13 +9,20 @@ import {
 	useState,
 } from "react";
 import { authClient } from "#/lib/auth-client";
+import type { StoredMeetingAddress } from "#/lib/workspace-addresses";
 
 export interface GroupSummary {
 	id: string;
 	name: string;
 	slug: string;
+	locality: string;
+	region: string | null;
+	countryCode: string;
+	timezone: string;
 	status: string;
+	createdAt: string;
 	role: "owner" | "admin" | "organizer" | "member";
+	addresses: StoredMeetingAddress[];
 }
 
 interface GroupContextValue {

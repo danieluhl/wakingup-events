@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
@@ -6,117 +6,158 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Theme: Stillpoint Bloom
+ * Stillpoint's pill buttons, controls and type on Dusk Bloom's plum ground,
+ * with concentric-ring moiré and a three-circle bloom mark.
+ */
+
+@property --iris-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
 :root {
   color-scheme: light;
 
-  --sea-ink: #263d3a;
-  --sea-ink-soft: #596b67;
-  --lagoon: #718f89;
-  --lagoon-deep: #3f6863;
-  --palm: #626d56;
-  --sand: #e4ddd2;
-  --foam: #f2ede5;
-  --surface: rgba(246, 241, 233, 0.78);
-  --surface-strong: rgba(250, 246, 239, 0.92);
-  --line: rgba(61, 49, 39, 0.18);
-  --inset-glint: rgba(255, 252, 245, 0.76);
-  --kicker: #6c604e;
-  --header-bg: rgba(241, 235, 225, 0.88);
-  --chip-bg: rgba(239, 231, 220, 0.88);
-  --chip-line: rgba(82, 67, 54, 0.22);
-  --link-bg-hover: rgba(230, 220, 207, 0.92);
+  /* Hidden-touch palette */
+  --iris: conic-gradient(
+    from var(--iris-angle),
+    #ffb8d1,
+    #ffd9a8,
+    #e3f5a6,
+    #a8f0dc,
+    #a9c9ff,
+    #d5b8ff,
+    #ffb8d1
+  );
+  --bloom-1: #f2b872;
+  --bloom-2: #f080aa;
+  --bloom-3: #a587fa;
+  --ring-line: rgba(91, 62, 140, 0.16);
 
-  --background: #f1ece4;
-  --foreground: #29231e;
-  --card: #f8f3eb;
-  --card-foreground: #29231e;
-  --popover: #f8f3eb;
-  --popover-foreground: #29231e;
-  --primary: #416762;
-  --primary-foreground: #f8f1e7;
-  --secondary: #d8cbbb;
-  --secondary-foreground: #302720;
-  --muted: #e5ddd2;
-  --muted-foreground: #6b6055;
-  --accent: #c1ab8a;
-  --accent-foreground: #2a221b;
-  --destructive: #9a5140;
-  --destructive-foreground: #fff8f0;
-  --border: #c8bcad;
-  --input: #c8bcad;
-  --ring: #567b76;
-  --chart-1: #8c684e;
-  --chart-2: #567d77;
-  --chart-3: #465b59;
-  --chart-4: #a78d65;
-  --chart-5: #7e725b;
-  --radius: 0.625rem;
-  --sidebar: #ebe4da;
-  --sidebar-foreground: #29231e;
-  --sidebar-primary: #416762;
-  --sidebar-primary-foreground: #f8f1e7;
-  --sidebar-accent: #d8cbbb;
-  --sidebar-accent-foreground: #302720;
-  --sidebar-border: #c8bcad;
-  --sidebar-ring: #567b76;
+  /* Extra tokens used by components */
+  --primary-hover: #3a2e3f;
+  --secondary-hover: #e7dde6;
+  --saffron: #b0702a;
+
+  /* Legacy tokens (kept so existing pages pick up the theme) */
+  --sea-ink: #231b26;
+  --sea-ink-soft: #6d6172;
+  --lagoon: #7a5bc4;
+  --lagoon-deep: #5b3e8c;
+  --palm: #b0702a;
+  --sand: #efe7ee;
+  --foam: #f2ece8;
+  --surface: rgba(255, 255, 255, 0.78);
+  --surface-strong: #faf6f4;
+  --line: #e8ded8;
+  --inset-glint: rgba(255, 255, 255, 0.7);
+  --kicker: #6d6172;
+  --header-bg: rgba(248, 244, 241, 0.88);
+  --chip-bg: #efe7ee;
+  --chip-line: #d8cbc4;
+  --link-bg-hover: #efe7ee;
+
+  --background: #f8f4f1;
+  --foreground: #231b26;
+  --card: #ffffff;
+  --card-foreground: #231b26;
+  --popover: #ffffff;
+  --popover-foreground: #231b26;
+  --primary: #231b26;
+  --primary-foreground: #fbf6f2;
+  --secondary: #efe7ee;
+  --secondary-foreground: #231b26;
+  --muted: #efe7ee;
+  --muted-foreground: #6d6172;
+  --accent: #efe7ee;
+  --accent-foreground: #231b26;
+  --destructive: #b24634;
+  --destructive-foreground: #fff8f4;
+  --border: #e8ded8;
+  --input: #d8cbc4;
+  --ring: #7a5bc4;
+  --chart-1: #7a5bc4;
+  --chart-2: #b0702a;
+  --chart-3: #c2577f;
+  --chart-4: #5b3e8c;
+  --chart-5: #8a7d8f;
+  --radius: 0.75rem;
+  --sidebar: #f2ece8;
+  --sidebar-foreground: #231b26;
+  --sidebar-primary: #231b26;
+  --sidebar-primary-foreground: #fbf6f2;
+  --sidebar-accent: #eae0ea;
+  --sidebar-accent-foreground: #231b26;
+  --sidebar-border: #e8ded8;
+  --sidebar-ring: #7a5bc4;
 }
 
 .dark {
   color-scheme: dark;
 
-  --sea-ink: #e5dccf;
-  --sea-ink-soft: #b8aa98;
-  --lagoon: #78928c;
-  --lagoon-deep: #abc0ba;
-  --palm: #8b967e;
-  --sand: #201a16;
-  --foam: #28211c;
-  --surface: rgba(43, 35, 29, 0.84);
-  --surface-strong: rgba(49, 40, 33, 0.94);
-  --line: rgba(207, 188, 162, 0.2);
-  --inset-glint: rgba(232, 218, 196, 0.12);
-  --kicker: #c0a77f;
-  --header-bg: rgba(29, 24, 20, 0.88);
-  --chip-bg: rgba(48, 39, 32, 0.92);
-  --chip-line: rgba(194, 166, 129, 0.24);
-  --link-bg-hover: rgba(64, 52, 43, 0.88);
+  --ring-line: rgba(185, 164, 242, 0.2);
 
-  --background: #181411;
-  --foreground: #eee5d8;
-  --card: #251e19;
-  --card-foreground: #eee5d8;
-  --popover: #251e19;
-  --popover-foreground: #eee5d8;
-  --primary: #86a29b;
-  --primary-foreground: #171411;
-  --secondary: #40342b;
-  --secondary-foreground: #eadfce;
-  --muted: #352c25;
-  --muted-foreground: #b7a998;
-  --accent: #6f5a43;
-  --accent-foreground: #f2e7d8;
-  --destructive: #7f4336;
-  --destructive-foreground: #f4d8ce;
-  --border: #514339;
-  --input: #514339;
-  --ring: #7f9b94;
-  --chart-1: #ad8161;
-  --chart-2: #789992;
-  --chart-3: #9c8b70;
-  --chart-4: #8c6e55;
-  --chart-5: #a75f4d;
-  --sidebar: #211b17;
-  --sidebar-foreground: #eee5d8;
-  --sidebar-primary: #86a29b;
-  --sidebar-primary-foreground: #171411;
-  --sidebar-accent: #40342b;
-  --sidebar-accent-foreground: #eadfce;
-  --sidebar-border: #514339;
-  --sidebar-ring: #7f9b94;
+  --primary-hover: #ffffff;
+  --secondary-hover: #352c41;
+  --saffron: #f2b872;
+
+  --sea-ink: #f2ebf3;
+  --sea-ink-soft: #ac9fb5;
+  --lagoon: #bdb0ff;
+  --lagoon-deep: #c9baff;
+  --palm: #f2b872;
+  --sand: #2b2435;
+  --foam: #1a1521;
+  --surface: rgba(32, 26, 40, 0.84);
+  --surface-strong: #1b1623;
+  --line: #342b3f;
+  --inset-glint: rgba(242, 235, 243, 0.06);
+  --kicker: #ac9fb5;
+  --header-bg: rgba(22, 18, 28, 0.88);
+  --chip-bg: #2b2435;
+  --chip-line: #463b53;
+  --link-bg-hover: #2b2435;
+
+  --background: #16121c;
+  --foreground: #f2ebf3;
+  --card: #201a28;
+  --card-foreground: #f2ebf3;
+  --popover: #201a28;
+  --popover-foreground: #f2ebf3;
+  --primary: #f4eef2;
+  --primary-foreground: #16121c;
+  --secondary: #2b2435;
+  --secondary-foreground: #f2ebf3;
+  --muted: #2b2435;
+  --muted-foreground: #ac9fb5;
+  --accent: #2b2435;
+  --accent-foreground: #f2ebf3;
+  --destructive: #f0907d;
+  --destructive-foreground: #16121c;
+  --border: #342b3f;
+  --input: #463b53;
+  --ring: #bdb0ff;
+  --chart-1: #bdb0ff;
+  --chart-2: #f2b872;
+  --chart-3: #f080aa;
+  --chart-4: #8fd3c1;
+  --chart-5: #ac9fb5;
+  --sidebar: #1a1521;
+  --sidebar-foreground: #f2ebf3;
+  --sidebar-primary: #f4eef2;
+  --sidebar-primary-foreground: #16121c;
+  --sidebar-accent: #2b2435;
+  --sidebar-accent-foreground: #f2ebf3;
+  --sidebar-border: #342b3f;
+  --sidebar-ring: #bdb0ff;
 }
 
 @theme inline {
-  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -163,7 +204,7 @@ body,
 
 body {
   margin: 0;
-  color: var(--sea-ink);
+  color: var(--foreground);
   font-family: var(--font-sans);
   background: var(--background);
   overflow-x: hidden;
@@ -171,10 +212,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+::selection {
+  background: #d7ccff;
+  color: #16121c;
+}
+
 code {
   font-size: 0.9em;
   border: 1px solid var(--line);
-  background: color-mix(in oklab, var(--surface-strong) 82%, white 18%);
+  background: var(--surface-strong);
   border-radius: 7px;
   padding: 2px 7px;
 }
@@ -191,8 +237,8 @@ pre code {
 .prose pre {
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #1d2e45;
-  color: #e8efff;
+  background: #1b1623;
+  color: #f2ebf3;
 }
 
 .page-wrap {
@@ -200,8 +246,11 @@ pre code {
   margin-inline: auto;
 }
 
+/* Instrument Serif ships a single weight; keep it un-bolded everywhere. */
 .display-title {
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 .island-shell {
@@ -209,70 +258,25 @@ pre code {
   background: var(--card);
   box-shadow:
     0 1px 0 var(--inset-glint) inset,
-    0 22px 44px rgba(30, 90, 72, 0.1),
-    0 6px 18px rgba(23, 58, 64, 0.08);
-  backdrop-filter: blur(4px);
+    0 12px 40px -26px rgba(60, 30, 80, 0.28);
+}
+
+.dark .island-shell {
+  box-shadow: 0 1px 0 var(--inset-glint) inset;
 }
 
 .feature-card {
   background: var(--card);
-  box-shadow:
-    0 1px 0 var(--inset-glint) inset,
-    0 18px 34px rgba(30, 90, 72, 0.1),
-    0 4px 14px rgba(23, 58, 64, 0.06);
+  box-shadow: 0 12px 40px -26px rgba(60, 30, 80, 0.28);
 }
 
 .feature-card:hover {
   transform: translateY(-2px);
-  border-color: color-mix(in oklab, var(--lagoon-deep) 35%, var(--line));
+  border-color: color-mix(in oklab, var(--lagoon) 40%, var(--line));
 }
 
 button {
   cursor: pointer;
-}
-
-.button-block {
-  --button-depth: #2b211b;
-  box-shadow:
-    -1px 1px 0 var(--button-depth),
-    -2px 2px 0 var(--button-depth),
-    -3px 3px 0 var(--button-depth),
-    -4px 4px 0 var(--button-depth),
-    -5px 5px 0 var(--button-depth),
-    -6px 6px 0 var(--button-depth),
-    -7px 7px 0 var(--button-depth),
-    -8px 8px 0 var(--button-depth);
-  transition: transform 100ms, box-shadow 100ms, background-color 100ms;
-}
-
-.dark .button-block {
-  --button-depth: #a99b84;
-}
-
-.button-block:not(:disabled):hover {
-  transform: translateY(-1px);
-}
-
-.button-block:not(:disabled):active {
-  transform: translate(-8px, 8px);
-  box-shadow: none;
-}
-
-.button-block:disabled {
-  box-shadow:
-    -1px 1px 0 var(--button-depth),
-    -2px 2px 0 var(--button-depth),
-    -3px 3px 0 var(--button-depth),
-    -4px 4px 0 var(--button-depth),
-    -5px 5px 0 var(--button-depth);
-}
-
-.button-block.button-flat,
-.button-block.button-flat:hover,
-.button-block.button-flat:active,
-.button-block.button-flat:disabled {
-  transform: none;
-  box-shadow: none;
 }
 
 button,
@@ -282,10 +286,190 @@ a {
     transform 180ms ease;
 }
 
+/* ── Buttons ────────────────────────────────────────────────────────────
+ * .btn       every button; carries the (hidden) oil-slick ring
+ * .btn-iris  primary + outline: the ring fades in on hover
+ * Any button shows the ring on keyboard focus.
+ */
+.btn {
+  position: relative;
+  isolation: isolate;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: var(--iris);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 600ms ease;
+  animation: iris-spin 5s linear infinite;
+}
+
+.btn-iris:not(:disabled):hover::before,
+.btn:focus-visible::before {
+  opacity: 1;
+}
+
+.btn-iris:not(:disabled):active {
+  transform: scale(0.965);
+}
+
+@keyframes iris-spin {
+  to {
+    --iris-angle: 360deg;
+  }
+}
+
+/* ── Bloom mark (logo): three blended circles drifting through hue ───── */
+.bloom-mark {
+  position: relative;
+  display: block;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  animation: bloom-hue 30s linear infinite;
+}
+
+.bloom-mark > i {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  mix-blend-mode: multiply;
+  opacity: 0.9;
+}
+
+.dark .bloom-mark > i {
+  mix-blend-mode: screen;
+}
+
+.bloom-mark > i:nth-child(1) {
+  left: 8px;
+  top: 1px;
+  background: var(--bloom-1);
+}
+
+.bloom-mark > i:nth-child(2) {
+  left: 1px;
+  top: 14px;
+  background: var(--bloom-2);
+}
+
+.bloom-mark > i:nth-child(3) {
+  left: 15px;
+  top: 14px;
+  background: var(--bloom-3);
+}
+
+@keyframes bloom-hue {
+  to {
+    filter: hue-rotate(360deg);
+  }
+}
+
+/* ── Ring field: two offset concentric-ring discs form a faint moiré ─── */
+.ring-field {
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+}
+
+.ring-field::before,
+.ring-field::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 640px;
+  height: 640px;
+  border-radius: 9999px;
+  background: repeating-radial-gradient(
+    circle,
+    var(--ring-line) 0 1px,
+    transparent 1px 13px
+  );
+  pointer-events: none;
+}
+
+.ring-field::before {
+  right: -180px;
+  top: -240px;
+}
+
+.ring-field::after {
+  right: -150px;
+  top: -222px;
+  animation: ring-drift 18s ease-in-out infinite;
+}
+
+@keyframes ring-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-10px, 6px);
+  }
+}
+
+/* A single ring disc for decorative placement (e.g. the landing page) */
+.ring-disc {
+  position: absolute;
+  border-radius: 9999px;
+  background: repeating-radial-gradient(
+    circle,
+    var(--ring-line) 0 1px,
+    transparent 1px 13px
+  );
+  pointer-events: none;
+}
+
+.ring-disc.is-drifting {
+  animation: ring-drift 18s ease-in-out infinite;
+}
+
+/* Today's date and the active nav dot share the oil-slick shimmer */
+.iris-ring {
+  position: relative;
+}
+
+.iris-ring::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  padding: 1.5px;
+  background: var(--iris);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: iris-spin 6s linear infinite;
+  pointer-events: none;
+}
+
+.iris-dot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--iris);
+  animation: iris-spin 3s linear infinite;
+}
+
 .island-kicker {
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 0.69rem;
   color: var(--kicker);
 }
@@ -339,6 +523,22 @@ a {
   background: color-mix(in oklab, var(--header-bg) 84%, transparent 16%);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .btn::before,
+  .bloom-mark,
+  .ring-field::after,
+  .ring-disc.is-drifting,
+  .iris-ring::before,
+  .iris-dot,
+  .rise-in {
+    animation: none;
+  }
+
+  .btn-iris:not(:disabled):active {
+    transform: none;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -349,11 +549,11 @@ a {
   }
   a {
     color: var(--lagoon-deep);
-    text-decoration-color: rgba(50, 143, 151, 0.4);
+    text-decoration-color: color-mix(in oklab, var(--lagoon-deep) 40%, transparent);
     text-decoration-thickness: 1px;
     text-underline-offset: 2px;
   }
   a:hover {
-    color: #246f76;
+    color: var(--foreground);
   }
 }

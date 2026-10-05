@@ -28,7 +28,6 @@ export function ThemeSelector() {
 					type="button"
 					variant="ghost"
 					size="icon"
-					className="button-flat border-transparent dark:border-transparent"
 					aria-label={`Theme: ${current.label.toLowerCase()}`}
 				>
 					<CurrentIcon className="size-4" aria-hidden="true" />

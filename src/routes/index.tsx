@@ -30,17 +30,13 @@ function Home() {
 	return (
 		<main className="relative isolate min-h-[calc(100dvh-4rem)] overflow-hidden bg-background text-foreground">
 			<div
-				className="pointer-events-none absolute inset-0 opacity-45 dark:opacity-20"
-				style={{
-					backgroundImage:
-						"linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px)",
-					backgroundSize: "72px 72px",
-					maskImage:
-						"linear-gradient(to right, transparent, black 45%, black 100%)",
-				}}
+				className="ring-disc -right-48 -top-40 size-168 lg:right-[2%]"
+				aria-hidden="true"
 			/>
-			<div className="pointer-events-none absolute -right-32 top-14 size-136 rounded-full border border-(--line) bg-[color-mix(in_oklab,var(--lagoon)_13%,transparent)] sm:-right-16 lg:right-[5%] lg:size-168" />
-			<div className="pointer-events-none absolute right-[18%] top-44 hidden size-72 rounded-full border border-(--line) lg:block" />
+			<div
+				className="ring-disc is-drifting -right-40 -top-34 size-168 lg:right-[4%]"
+				aria-hidden="true"
+			/>
 
 			<div className="relative mx-auto grid min-h-[calc(100dvh-4rem)] max-w-360 items-center gap-14 px-6 py-16 sm:px-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(25rem,0.9fr)] lg:px-16 lg:py-20">
 				<section className="rise-in max-w-4xl">

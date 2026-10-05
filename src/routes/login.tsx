@@ -71,7 +71,7 @@ function Login() {
 			<main className="min-h-[calc(100dvh-4rem)] bg-background px-6 py-16">
 				<div className="mx-auto max-w-md space-y-4">
 					<Skeleton className="h-5 w-40" />
-					<Skeleton className="h-72 w-full rounded-none" />
+					<Skeleton className="h-72 w-full rounded-2xl" />
 				</div>
 			</main>
 		);
@@ -80,11 +80,11 @@ function Login() {
 	if (session?.user) {
 		return (
 			<main className="min-h-[calc(100dvh-4rem)] bg-background px-6 py-20 text-foreground">
-				<Card className="mx-auto max-w-md gap-8 rounded-none border-border bg-card shadow-none">
+				<Card className="island-shell mx-auto max-w-md gap-8 rounded-2xl">
 					<CardHeader>
 						<Badge
 							variant="outline"
-							className="w-fit border-0 bg-transparent px-0 text-sm uppercase tracking-[0.24em] text-[#bba176]"
+							className="w-fit border-0 bg-transparent px-0 text-sm uppercase tracking-[0.18em] text-muted-foreground"
 						>
 							Already signed in
 						</Badge>
@@ -109,11 +109,11 @@ function Login() {
 				>
 					Back to Waking Up Events
 				</Link>
-				<Card className="mt-8 gap-8 rounded-none border-border bg-card shadow-2xl shadow-black/30">
+				<Card className="island-shell mt-8 gap-8 rounded-2xl">
 					<CardHeader>
 						<Badge
 							variant="outline"
-							className="w-fit border-0 bg-transparent px-0 text-sm uppercase tracking-[0.24em] text-[#bba176]"
+							className="w-fit border-0 bg-transparent px-0 text-sm uppercase tracking-[0.18em] text-muted-foreground"
 						>
 							Local account
 						</Badge>
@@ -151,7 +151,6 @@ function Login() {
 										type="text"
 										autoComplete="name"
 										required
-										className="h-auto rounded-none border-input bg-background px-4 py-3 text-foreground focus-visible:border-[#8aa39d] focus-visible:ring-[#8aa39d]/20"
 									/>
 								</div>
 							)}
@@ -163,7 +162,6 @@ function Login() {
 									type="email"
 									autoComplete="email"
 									required
-									className="h-auto rounded-none border-input bg-background px-4 py-3 text-foreground focus-visible:border-[#8aa39d] focus-visible:ring-[#8aa39d]/20"
 								/>
 							</div>
 							<div className="grid gap-2">
@@ -177,18 +175,12 @@ function Login() {
 									}
 									minLength={8}
 									required
-									className="h-auto rounded-none border-input bg-background px-4 py-3 text-foreground focus-visible:border-[#8aa39d] focus-visible:ring-[#8aa39d]/20"
 								/>
 							</div>
 							{error && (
-								<Alert
-									variant="destructive"
-									className="rounded-none border-red-900 bg-red-950/50 [&>svg]:text-red-400"
-								>
+								<Alert variant="destructive">
 									<CircleAlert className="size-4" />
-									<AlertDescription className="text-red-300">
-										{error}
-									</AlertDescription>
+									<AlertDescription>{error}</AlertDescription>
 								</Alert>
 							)}
 							<Button

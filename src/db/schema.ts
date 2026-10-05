@@ -86,7 +86,6 @@ export const workspaces = sqliteTable(
 		region: text(),
 		countryCode: text("country_code").notNull(),
 		timezone: text().notNull(),
-		googleCalendarId: text("google_calendar_id"),
 		status: text().notNull().default("active"),
 		createdByUserId: text("created_by_user_id")
 			.notNull()
@@ -209,6 +208,28 @@ export const workspaceSubscriptions = sqliteTable(
 	],
 );
 
+export const meetingTypes = sqliteTable(
+	"meeting_type",
+	{
+		id: text().primaryKey(),
+		workspaceId: text("workspace_id")
+			.notNull()
+			.references(() => workspaces.id, { onDelete: "cascade" }),
+		title: text().notNull(),
+		description: text(),
+		alert: text(),
+		instructions: text(),
+		sortOrder: integer("sort_order").notNull().default(0),
+		createdAt: integer("created_at", { mode: "timestamp" })
+			.notNull()
+			.default(sql`(unixepoch())`),
+		updatedAt: integer("updated_at", { mode: "timestamp" })
+			.notNull()
+			.default(sql`(unixepoch())`),
+	},
+	(table) => [index("meeting_type_workspace_id_idx").on(table.workspaceId)],
+);
+
 export const events = sqliteTable(
 	"event",
 	{
@@ -216,11 +237,18 @@ export const events = sqliteTable(
 		workspaceId: text("workspace_id")
 			.notNull()
 			.references(() => workspaces.id, { onDelete: "cascade" }),
+		meetingTypeId: text("meeting_type_id").references(() => meetingTypes.id, {
+			onDelete: "set null",
+		}),
 		title: text().notNull(),
 		startsAt: integer("starts_at", { mode: "timestamp" }).notNull(),
 		durationMinutes: integer("duration_minutes").notNull(),
 		location: text().notNull(),
-		googleEventId: text("google_event_id"),
+		attendanceCount: integer("attendance_count"),
+		postEventNotes: text("post_event_notes"),
+		postEventUpdatedAt: integer("post_event_updated_at", {
+			mode: "timestamp",
+		}),
 		organizerUserId: text("organizer_user_id")
 			.notNull()
 			.references(() => users.id),

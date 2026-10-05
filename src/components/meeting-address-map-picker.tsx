@@ -103,7 +103,7 @@ function PickerMap({ picked }: { picked: PickedAddress | null }) {
 					position={{ lat: picked.latitude, lng: picked.longitude }}
 				>
 					<Pin
-						background="#0f766e"
+						background="#5b3e8c"
 						borderColor="#ffffff"
 						glyphColor="#ffffff"
 					/>

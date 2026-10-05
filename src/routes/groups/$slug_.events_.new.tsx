@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { CircleAlert, Plus } from "lucide-react";
+import { CircleAlert, Info, Plus, TriangleAlert } from "lucide-react";
 import { type FormEvent, useEffect, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "#/components/ui/alert";
 import { Badge } from "#/components/ui/badge";
@@ -23,6 +23,7 @@ import {
 import { Skeleton } from "#/components/ui/skeleton";
 import { authClient } from "#/lib/auth-client";
 import { zonedDateTimeInputDefault, zonedDateTimeToUtc } from "#/lib/events";
+import type { MeetingTypeRecord } from "#/lib/meeting-types";
 import {
 	formatMeetingAddress,
 	type StoredMeetingAddress,
@@ -41,6 +42,7 @@ interface WorkspaceDetails {
 	timezone: string;
 	role: WorkspaceRole;
 	addresses: StoredMeetingAddress[];
+	meetingTypes: MeetingTypeRecord[];
 }
 
 interface WorkspaceMember {
@@ -53,6 +55,7 @@ interface WorkspaceMember {
 }
 
 const OTHER_LOCATION = "other";
+const NO_MEETING_TYPE = "none";
 
 export const Route = createFileRoute("/groups/$slug_/events_/new")({
 	component: NewEvent,
@@ -73,6 +76,7 @@ function NewEvent() {
 	const [durationMinutes, setDurationMinutes] = useState("0");
 	const [locationChoice, setLocationChoice] = useState("");
 	const [customLocation, setCustomLocation] = useState("");
+	const [meetingTypeId, setMeetingTypeId] = useState(NO_MEETING_TYPE);
 	const [organizerUserId, setOrganizerUserId] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -202,6 +206,8 @@ function NewEvent() {
 						durationMinutes: totalDurationMinutes,
 						location,
 						organizerUserId,
+						meetingTypeId:
+							meetingTypeId === NO_MEETING_TYPE ? null : meetingTypeId,
 					}),
 				},
 			);
@@ -285,6 +291,9 @@ function NewEvent() {
 	const organizerOptions =
 		members?.filter((member) => canManageEvents(member.role)) ?? [];
 
+	const selectedMeetingType =
+		workspace.meetingTypes.find((type) => type.id === meetingTypeId) ?? null;
+
 	return (
 		<main className="page-wrap min-h-[calc(100dvh-4rem)] py-10 sm:py-16">
 			<div className="mx-auto max-w-2xl">
@@ -311,6 +320,78 @@ function NewEvent() {
 					</CardHeader>
 					<CardContent className="px-6 pb-8 sm:px-10">
 						<form className="grid gap-5" onSubmit={handleSubmit}>
+							{workspace.meetingTypes.length > 0 && (
+								<div className="grid gap-3 rounded-xl border bg-[var(--surface-strong)] p-4 sm:p-5">
+									<div className="grid gap-2">
+										<Label htmlFor="event-meeting-type">
+											What type of event is this?
+										</Label>
+										<Select
+											value={meetingTypeId}
+											onValueChange={setMeetingTypeId}
+										>
+											<SelectTrigger id="event-meeting-type" className="w-full">
+												<SelectValue placeholder="Choose a meeting type" />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value={NO_MEETING_TYPE}>
+													Not sure yet
+												</SelectItem>
+												{workspace.meetingTypes.map((meetingType) => (
+													<SelectItem
+														key={meetingType.id}
+														value={meetingType.id}
+													>
+														{meetingType.title}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										<p className="text-xs text-muted-foreground">
+											Choosing a type shows how this group usually holds it.
+										</p>
+									</div>
+									{selectedMeetingType && (
+										<div className="grid gap-3 rounded-lg border border-dashed bg-background/60 p-4">
+											<div className="flex items-start gap-2">
+												<Info
+													className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+													aria-hidden="true"
+												/>
+												<div className="min-w-0">
+													<p className="font-medium">
+														{selectedMeetingType.title}
+													</p>
+													{selectedMeetingType.description && (
+														<p className="mt-1 text-sm leading-6 text-muted-foreground">
+															{selectedMeetingType.description}
+														</p>
+													)}
+												</div>
+											</div>
+											{selectedMeetingType.alert && (
+												<Alert className="bg-background/60">
+													<TriangleAlert aria-hidden="true" />
+													<AlertTitle>Heads up</AlertTitle>
+													<AlertDescription className="whitespace-pre-line">
+														{selectedMeetingType.alert}
+													</AlertDescription>
+												</Alert>
+											)}
+											{selectedMeetingType.instructions && (
+												<div>
+													<p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+														Setup instructions
+													</p>
+													<p className="text-sm leading-6 whitespace-pre-line">
+														{selectedMeetingType.instructions}
+													</p>
+												</div>
+											)}
+										</div>
+									)}
+								</div>
+							)}
 							<div className="grid gap-2">
 								<Label htmlFor="event-title">Event title</Label>
 								<Input

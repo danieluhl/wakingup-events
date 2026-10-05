@@ -66,9 +66,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 		hasRestorableSelection,
 	} = useGroup();
 	const defaultSelectionAppliedForUser = useRef<string | null>(null);
-	const isPublicPage = pathname === "/" || pathname === "/login";
+	const isAuthOptionalPage =
+		pathname === "/" ||
+		pathname === "/login" ||
+		/^\/groups\/[^/]+\/events$/.test(pathname);
+	const isPublicPage =
+		pathname === "/" ||
+		pathname === "/login" ||
+		(!session?.user && isAuthOptionalPage);
 	const isRedirectingToRoot =
-		!isSessionPending && !session?.user && !isPublicPage;
+		!isSessionPending && !session?.user && !isAuthOptionalPage;
 
 	useEffect(() => {
 		if (isRedirectingToRoot) {
@@ -127,7 +134,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 							</div>
 						</div>
 					</header>
-					<div>{children}</div>
+					<div className="ring-field">{children}</div>
 				</div>
 			) : (
 				<>
@@ -170,7 +177,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 								)}
 							</div>
 						</header>
-						<main className="min-w-0 flex-1">{children}</main>
+						<main className="ring-field min-w-0 flex-1">{children}</main>
 					</SidebarInset>
 				</>
 			)}
@@ -184,8 +191,10 @@ function Brand() {
 			to="/home"
 			className="flex min-w-0 items-center gap-3 text-foreground no-underline group-data-[collapsible=icon]:justify-center hover:text-foreground"
 		>
-			<span className="flex size-9 shrink-0 items-center justify-center border border-primary bg-primary text-primary-foreground">
-				<CalendarDays className="size-4" aria-hidden="true" />
+			<span className="bloom-mark" aria-hidden="true">
+				<i />
+				<i />
+				<i />
 			</span>
 			<span className="min-w-0 leading-none group-data-[collapsible=icon]:hidden">
 				<span className="display-title block truncate text-lg font-bold">
@@ -365,6 +374,12 @@ function NavigationLinks({
 								<span className="group-data-[collapsible=icon]:hidden">
 									{item.label}
 								</span>
+								{isActive && (
+									<span
+										className="iris-dot ml-auto shrink-0 group-data-[collapsible=icon]:hidden"
+										aria-hidden="true"
+									/>
+								)}
 							</Link>
 						</SidebarMenuButton>
 					</SidebarMenuItem>
@@ -383,6 +398,12 @@ function NavigationLinks({
 							<span className="group-data-[collapsible=icon]:hidden">
 								Events
 							</span>
+							{isEventsActive && (
+								<span
+									className="iris-dot ml-auto shrink-0 group-data-[collapsible=icon]:hidden"
+									aria-hidden="true"
+								/>
+							)}
 						</Link>
 					</SidebarMenuButton>
 				</SidebarMenuItem>

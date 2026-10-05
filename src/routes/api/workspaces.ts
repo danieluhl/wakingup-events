@@ -1,19 +1,21 @@
 import { env } from "cloudflare:workers";
 import { createFileRoute } from "@tanstack/react-router";
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { z } from "zod";
-import { workspaceAddresses, workspaceMembers, workspaces } from "#/db/schema";
+import {
+	meetingTypes,
+	workspaceAddresses,
+	workspaceMembers,
+	workspaces,
+} from "#/db/schema";
 import { auth } from "#/lib/auth";
 import { geocodeMeetingAddress } from "#/lib/geocoding";
-import {
-	createCalendar,
-	isGoogleCalendarConfigured,
-	makeCalendarPublic,
-} from "#/lib/google-calendar";
+import { meetingTypeToRecord } from "#/lib/meeting-types";
 import {
 	type MeetingAddressInput,
 	meetingAddressInput,
+	type StoredMeetingAddress,
 } from "#/lib/workspace-addresses";
 
 const workspaceInput = z.object({
@@ -98,6 +100,19 @@ async function getMeetingAddresses(
 		.orderBy(asc(workspaceAddresses.sortOrder));
 }
 
+async function getMeetingTypes(
+	db: ReturnType<typeof drizzle>,
+	workspaceId: string,
+) {
+	const rows = await db
+		.select()
+		.from(meetingTypes)
+		.where(eq(meetingTypes.workspaceId, workspaceId))
+		.orderBy(asc(meetingTypes.sortOrder), asc(meetingTypes.createdAt));
+
+	return rows.map(meetingTypeToRecord);
+}
+
 async function getWorkspaceAccess(request: Request) {
 	const currentSession = await getSession(request);
 	if (!currentSession) {
@@ -149,8 +164,17 @@ async function getWorkspaceAccess(request: Request) {
 	}
 
 	const addresses = await getMeetingAddresses(db, workspace.id);
+	const meetingTypesForWorkspace = await getMeetingTypes(db, workspace.id);
 
-	return { currentSession, db, workspace: { ...workspace, addresses } };
+	return {
+		currentSession,
+		db,
+		workspace: {
+			...workspace,
+			addresses,
+			meetingTypes: meetingTypesForWorkspace,
+		},
+	};
 }
 
 const getWorkspace = async ({ request }: { request: Request }) => {
@@ -166,7 +190,12 @@ const getWorkspace = async ({ request }: { request: Request }) => {
 				id: workspaces.id,
 				name: workspaces.name,
 				slug: workspaces.slug,
+				locality: workspaces.locality,
+				region: workspaces.region,
+				countryCode: workspaces.countryCode,
+				timezone: workspaces.timezone,
 				status: workspaces.status,
+				createdAt: workspaces.createdAt,
 				role: workspaceMembers.role,
 			})
 			.from(workspaceMembers)
@@ -174,7 +203,38 @@ const getWorkspace = async ({ request }: { request: Request }) => {
 			.where(eq(workspaceMembers.userId, currentSession.user.id))
 			.orderBy(desc(workspaceMembers.createdAt));
 
-		return Response.json({ workspaces: workspacesForUser });
+		const workspaceIds = workspacesForUser.map((workspace) => workspace.id);
+		const addressRows =
+			workspaceIds.length > 0
+				? await db
+						.select({
+							id: workspaceAddresses.id,
+							workspaceId: workspaceAddresses.workspaceId,
+							label: workspaceAddresses.label,
+							street: workspaceAddresses.street,
+							locality: workspaceAddresses.locality,
+							region: workspaceAddresses.region,
+							postalCode: workspaceAddresses.postalCode,
+							countryCode: workspaceAddresses.countryCode,
+						})
+						.from(workspaceAddresses)
+						.where(inArray(workspaceAddresses.workspaceId, workspaceIds))
+						.orderBy(asc(workspaceAddresses.sortOrder))
+				: [];
+
+		const addressesByWorkspace = new Map<string, StoredMeetingAddress[]>();
+		for (const address of addressRows) {
+			const existing = addressesByWorkspace.get(address.workspaceId) ?? [];
+			existing.push(address);
+			addressesByWorkspace.set(address.workspaceId, existing);
+		}
+
+		return Response.json({
+			workspaces: workspacesForUser.map((workspace) => ({
+				...workspace,
+				addresses: addressesByWorkspace.get(workspace.id) ?? [],
+			})),
+		});
 	}
 
 	const access = await getWorkspaceAccess(request);
@@ -236,7 +296,6 @@ const createWorkspace = async ({ request }: { request: Request }) => {
 		id: workspaceId,
 		...workspaceFields,
 		...primaryLocation(inputAddresses),
-		googleCalendarId: null as string | null,
 		status: "active",
 		createdByUserId: currentSession.user.id,
 	};
@@ -261,29 +320,8 @@ const createWorkspace = async ({ request }: { request: Request }) => {
 		throw error;
 	}
 
-	if (isGoogleCalendarConfigured()) {
-		try {
-			const calendarId = await createCalendar(
-				workspace.name,
-				workspace.timezone,
-			);
-			await makeCalendarPublic(calendarId);
-			await db
-				.update(workspaces)
-				.set({ googleCalendarId: calendarId, updatedAt: new Date() })
-				.where(eq(workspaces.id, workspaceId));
-			workspace.googleCalendarId = calendarId;
-		} catch (error) {
-			console.error(
-				"Could not create a Google calendar for this group",
-				workspaceId,
-				error,
-			);
-		}
-	}
-
 	return Response.json(
-		{ workspace: { ...workspace, addresses, role: "owner" } },
+		{ workspace: { ...workspace, addresses, meetingTypes: [], role: "owner" } },
 		{ status: 201 },
 	);
 };

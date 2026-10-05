@@ -7,9 +7,6 @@ interface __BaseEnv_Env {
 	BETTER_AUTH_SECRET: string;
 	GOOGLE_CLIENT_SECRET: string;
 	GOOGLE_CLIENT_ID: string;
-	GOOGLE_CALENDAR_CLIENT_ID: string;
-	GOOGLE_CALENDAR_CLIENT_SECRET: string;
-	GOOGLE_CALENDAR_REFRESH_TOKEN: string;
 	VITE_GOOGLE_MAPS_API_KEY: string;
 	DATABASE_URL: string;
 	GOOGLE_MAPS_API_KEY: string;
@@ -22,7 +19,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "BETTER_AUTH_URL" | "BETTER_AUTH_SECRET" | "GOOGLE_CLIENT_SECRET" | "GOOGLE_CLIENT_ID" | "GOOGLE_CALENDAR_CLIENT_ID" | "GOOGLE_CALENDAR_CLIENT_SECRET" | "GOOGLE_CALENDAR_REFRESH_TOKEN" | "VITE_GOOGLE_MAPS_API_KEY" | "DATABASE_URL" | "GOOGLE_MAPS_API_KEY">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "BETTER_AUTH_URL" | "BETTER_AUTH_SECRET" | "GOOGLE_CLIENT_SECRET" | "GOOGLE_CLIENT_ID" | "VITE_GOOGLE_MAPS_API_KEY" | "DATABASE_URL" | "GOOGLE_MAPS_API_KEY">> {}
 }
 
 // Begin runtime types
