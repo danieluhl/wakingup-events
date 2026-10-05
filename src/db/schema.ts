@@ -268,13 +268,3 @@ export const events = sqliteTable(
 		check("event_duration_minutes_check", sql`${table.durationMinutes} > 0`),
 	],
 );
-
-export const todos = sqliteTable("todos", {
-	id: integer({ mode: "number" }).primaryKey({
-		autoIncrement: true,
-	}),
-	title: text().notNull(),
-	createdAt: integer("created_at", { mode: "timestamp" }).default(
-		sql`(unixepoch())`,
-	),
-});
